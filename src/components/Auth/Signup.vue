@@ -77,6 +77,7 @@
   </div>
 </template>
 <script>
+/* eslint-disable */
 import { log } from "util";
 export default {
   name: "signup",
@@ -98,7 +99,10 @@ export default {
   },
   methods: {
     CreateNewUser() {
-      let err = this.Validated(this.signupForm);
+      let valid = this.Validated(this.signupForm);
+      if (valid == true) {
+        alert("all okk");
+      }
     },
     Validated(data) {
       this.errorMsg = {};
@@ -112,15 +116,24 @@ export default {
           return false;
         }
       }
-      if (data.email) {
-        var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        re.test(data.email) ? "" : (this.errorMsg.email = "Email is not valid");
+      //if (data.email.length > 0) {
+      var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+      if (!re.test(data.email)) {
+        this.errorMsg.email = "Email is not valid";
         return false;
-      } else if (data.password.length < 6) {
-        this.errorMsg.password = "password length must be 6 characters";
-      } else if (data.password != data.cpassword) {
-        this.errorMsg.cpassword = "Passwords don't match";
       }
+      if (data.password.length < 6) {
+        this.errorMsg.password = "password length must be 6 characters";
+        return false;
+      }
+      if (data.password != data.cpassword) {
+        this.errorMsg.cpassword = "Passwords don't match";
+        return false;
+      }
+      //	}
+
+      return true;
     }
   }
 };
@@ -133,9 +146,10 @@ div#signup {
   background-image: linear-gradient(
     to top,
     rgba(0, 0, 0, 0.2),
-    rgba(93, 213, 226, 0.9)
+    rgba(93, 213, 226, 0.95)
   );
-  height: calc(100vh - 56px);
+  min-height: calc(100vh - 40px);
+  max-height: 100vh;
 }
 form.signup-form {
   background: rgba(106, 122, 120, 0.35);

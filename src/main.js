@@ -1,12 +1,37 @@
 /* eslint-disable */
+try {
+  window.Popper = require('popper.js').default;
+  window.$ = window.jQuery = require('jquery');
+  require('bootstrap');
+} catch (e) { }
+
+window.axios = require('axios');
+import 'bootstrap/dist/css/bootstrap.min.css'
+// import 'bootstrap/dist/js/bootstrap.min.js'
+
+
+
 import Vue from 'vue'
 import Router from 'vue-router';
 import App from './App.vue'
-window.jQuery = window.$ = require('jquery')
-import 'bootstrap'
-// import 'bootstrap/dist/js/bootstrap.min.js'
-import 'bootstrap/dist/css/bootstrap.min.css'
-Vue.use(Router);
+import cors from 'cors'
+
+let options = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Request-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
+  'X-Requested-With': 'XMLHttpRequest',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length, X-Requested-With',
+}
+Vue.use(cors(options))
+
+Vue.use(Router)
+
+// window.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
+// window.axios.defaults.headers.common['Access-Control-Request-Methods'] = 'GET,PUT,POST,DELETE,OPTIONS'
+// window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+// window.axios.defaults.headers.common['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Content-Length, X-Requested-With'
+
+
 Vue.config.productionTip = false
 /* Components */
 import Home from './components/Home'
@@ -15,7 +40,7 @@ import Login from './components/Auth/Login'
 import Signup from './components/Auth/Signup'
 const routes = [
   {
-    name: 'home', path: '/home', component: Home,
+    name: 'home', path: '/', component: Home,
     meta: {
       title: 'Home', requiresAuth: true
     }
@@ -53,6 +78,7 @@ const router = new Router({
 });*/
 router.afterEach((to, from) => {
   document.title = to.meta.title || 'Welcome';
+  //$('#navbar-collapse').collapse('hide');
 });
 new Vue({
   router: router,

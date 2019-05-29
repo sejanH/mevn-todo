@@ -8,10 +8,10 @@
 </template>
 
 <script>
-  import Navbar from './components/Partials/Navbar'
+import Navbar from "./components/Partials/Navbar";
 export default {
   name: "app",
-  components: {Navbar}
+  components: { Navbar }
 };
 </script>
 <style>
@@ -20,11 +20,8 @@ body {
   margin: 0;
 }
 
-.nav-item > .router-link-exact-active {
-  padding: 0.45rem 1rem;
-  border-bottom: 2px solid ghostwhite;
-}
-.bg-mevn{
-  background: rgba(93, 219, 226,1);
+.bg-mevn {
+  /* background: rgba(93, 219, 226,1);*/
+  background: rgba(93, 213, 226, 1);
 }
 </style>
