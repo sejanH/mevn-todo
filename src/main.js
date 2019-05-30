@@ -14,22 +14,9 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import Vue from 'vue'
 import Router from 'vue-router';
 import App from './App.vue'
-import cors from 'cors'
 
-let options = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Request-Methods': 'GET,PUT,POST,DELETE,OPTIONS',
-  'X-Requested-With': 'XMLHttpRequest',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length, X-Requested-With',
-}
-Vue.use(cors(options))
 
 Vue.use(Router)
-
-// window.axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'
-// window.axios.defaults.headers.common['Access-Control-Request-Methods'] = 'GET,PUT,POST,DELETE,OPTIONS'
-// window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
-// window.axios.defaults.headers.common['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Content-Length, X-Requested-With'
 
 
 Vue.config.productionTip = false

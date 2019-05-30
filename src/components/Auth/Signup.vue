@@ -22,6 +22,7 @@
           <label for="inputEmail3" class="col-form-label font-weight-bold">Email</label>
           <input
             type="text"
+            name="email"
             :class="[errorMsg.email?'is-invalid':'is-valid','form-control']"
             id="inputEmail3"
             placeholder="Your valid email"
@@ -36,8 +37,9 @@
             type="text"
             :class="[errorMsg.name?'is-invalid':'is-valid','form-control']"
             id="inputName"
+            name="name"
             placeholder="Your Full Name"
-            autocomplete="new-name"
+            autocomplete="new-password"
             v-model="signupForm.name"
           >
           <span class="error text-danger" v-if="errorMsg.name">{{errorMsg.name}}</span>
@@ -46,6 +48,7 @@
           <label for="inputPassword3" class="col-form-label font-weight-bold">Password</label>
           <input
             type="password"
+            name="password"
             :class="[errorMsg.password?'is-invalid':'is-valid','form-control']"
             id="inputPassword3"
             placeholder="Password must be 6 characters long"
@@ -61,6 +64,7 @@
           >Confirm Password</label>
           <input
             type="password"
+            name="cpassword"
             :class="[errorMsg.cpassword?'is-invalid':'is-valid','form-control']"
             id="inputPasswordConfirm3"
             placeholder="Enter Password Again"
@@ -101,7 +105,9 @@ export default {
     CreateNewUser() {
       let valid = this.Validated(this.signupForm);
       if (valid == true) {
-        alert("all okk");
+        axios.post('http://localhost:8081/signup',this.signupForm).then(response=>{
+          console.log(response.data);
+        });
       }
     },
     Validated(data) {
@@ -148,7 +154,7 @@ div#signup {
     rgba(0, 0, 0, 0.2),
     rgba(93, 213, 226, 0.95)
   );
-  min-height: calc(100vh - 40px);
+  min-height: calc(100vh - 41px);
   max-height: 100vh;
 }
 form.signup-form {

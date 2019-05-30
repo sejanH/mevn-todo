@@ -5,9 +5,7 @@
 <script>
 export default {
   name: "home",
-  created() {
-    axios.get("http://mominulhaque.xyz/dashboard/device");
-  }
+  
 };
 </script>
 
@@ -19,7 +17,7 @@ div#app {
     rgba(255, 255, 255, 0.85),
     rgba(93, 213, 226, 0.95)
   );
-  min-height: calc(100vh - 40px);
+  min-height: calc(100vh - 41px);
   max-height: 100vh;
 }
 </style>

@@ -95,7 +95,7 @@ div#login {
     rgba(0, 0, 0, 0),
     rgba(93, 213, 226, 0.95)
   );
-  height: calc(100vh - 40px);
+  height: calc(100vh - 41px);
 }
 form.login-form {
   background: rgba(18, 158, 158, 0.35);

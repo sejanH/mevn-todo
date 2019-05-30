@@ -1,8 +1,8 @@
 <template>
-		<div id="todo" class="row justify-content-center">
-			<div class="col-md-3" id="todo-list">
+	<div id="todo" class="row justify-content-center">
+		<div class="col-md-3" id="todo-list">
 			<h6>Select one </h6>
-				<div class="scrollbar">
+			<div class="scrollbar">
 				<div class="handle">
 					<div class="mousearea"></div>
 				</div>
@@ -10,33 +10,44 @@
 
 			<div class="frame smart" id="smart">
 				<ul class="items">
-					<li>0</li><li>1</li><li>2</li><li>3</li><li>4</li><li>5</li><li>6</li><li>7</li><li>8</li><li>9</li>
-					<li>10</li><li>11</li><li>12</li><li>13</li><li>14</li>
+					<li v-for="todo in todos">{{todo.id}}</li>
 				</ul>
 			</div>
-			</div>
-			<div class="col-md-8">
-				Preview
-			</div>
 		</div>
+		<div class="col-md-8">
+			<ul class="list-group"> 
+			</ul>
+		</div>
+	</div>
 </template>
 <script>
 	export default{
 		name:'todo',
-		mounted() {
-			const plugin = document.createElement("script");
-			plugin.setAttribute("src","/js/sly.min.js");
-			plugin.async = true;
-			document.head.appendChild(plugin);
+		data(){
+			return{
+				todos:[]
+			}
+		},
+		created() {
 			
-	
+			axios.get("http://localhost:8081/posts")
+			.then(res=>{
+					this.todos = res.data;
+				const plugin = document.createElement("script");
+				plugin.setAttribute("src","/js/sly.min.js");
+				plugin.async = true;
+				document.head.appendChild(plugin);
+			});
+
+		},
+		mounted() {
 		}
 	}
 </script>
 
 <style scoped>
 #todo{
-	min-height: calc(100vh - 40px);
+	min-height: calc(100vh - 41px);
 	max-height: 100vh;
 }
 h5{
