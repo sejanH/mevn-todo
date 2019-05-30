@@ -1,52 +1,42 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-mongoose.connect('mongodb://mevn:xxxxxx00@ds143342.mlab.com:43342/mevn-todo',{ useNewUrlParser: true });
+mongoose.connect('mongodb://mevn:xxxxxx00@ds143342.mlab.com:43342/mevn-todo', { useNewUrlParser: true });
 var db = mongoose.connection;
 
-
-
-const UserSchema = mongoose.Schema({
-   name:{
-       type: String,
-       required: true
-   } ,
-    password :{
+const User = mongoose.model('User', new mongoose.Schema({
+    name: {
         type: String,
-        required:true,
-        bcrypt:true
+        required: true,
+        minlength: 5,
+        maxlength: 50
     },
-    email:{
-       type: String,
-       index:true
+    email: {
+        type: String,
+        required: true,
+        minlength: 5,
+        maxlength: 255,
+        unique: true
     },
-    todos:{
-      type: Object, default: []
+    password: {
+        type: String,
+        required: true,
+        minlength: 5,
+        maxlength: 1024
+    },
+    todos: {
+        type: Array,
+        default: []
     }
-});
-var User = module.exports = mongoose.model('User',UserSchema);
-
-module.exports.getUserById = function (id,callback) {
-    User.findById(id,callback);
-}
-module.exports.getUserByEmail = function (email,callback) {
-    var query = {email: email};
-    User.findOne(query,callback);
-}
+}));
 
 
-module.exports.comparePassword = function (candidatePassword,hash,callback) {
-    bcrypt.compare(candidatePassword,hash,function (err,isMatch) {
-        if(err) return callback(err);
-        callback(null,isMatch);
-    });
-}
 
-module.exports.createUser = function (newUser,callback) {
-    bcrypt.hash(newUser.password,10,function (err,hash) {
-        if(err) throw err;
-        //set hashed pass
+exports.User = User;
+
+exports.createUser = function (newUser, callback) {
+    bcrypt.hash(newUser.password, 10, function (err, hash) {
+        if (err) throw err;
         newUser.password = hash;
-        //create a new user
         newUser.save(callback);
     });
 }

@@ -103,11 +103,16 @@ export default {
   },
   methods: {
     CreateNewUser() {
-      let valid = this.Validated(this.signupForm);
+      let valid = true; //this.Validated(this.signupForm);
       if (valid == true) {
-        axios.post('http://localhost:8081/signup',this.signupForm).then(response=>{
-          console.log(response.data);
-        });
+        axios
+          .post("http://localhost:8081/user/signup", this.signupForm)
+          .then(response => {
+            console.log(response.data);
+          })
+          .catch(error => {
+            console.log(error.request.response);
+          });
       }
     },
     Validated(data) {
