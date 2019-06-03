@@ -1,31 +1,33 @@
 const { User, createUser } = require('../models/user');
 const express = require('express');
 const router = express.Router();
-const { check } = require('express-validator/check');
+const { check, validationResult } = require('express-validator/check');
 
-router.post('/signup', [
-    check('name').not().isEmpty().withMessage('Name is required'),
-    check('email', 'Email is required').not().isEmpty().isEmail().withMessage('Email not valid'),
-    check('password').not().isEmpty().isLength({ min: 6 }).withMessage('Password length is minimum 6 characters')
-        .custom((value, { req, loc, path }) => {
-            if (value != req.body.cpassword) {
-                throw new Error("Passwords don't match");
-            } else {
-                return value;
+router.post('/new', [
+    check('name').not().isEmpty().withMessage('Name is required').trim().escape(),
+    check('password', 'Password is required').not().isEmpty().isLength({ min: 6 }).withMessage('Password length is minimum 6 characters').trim().escape(),
+    check('cpassword').optional().not().isEmpty().withMessage('Confirm Password is required')
+        .custom((value, { req }) => {
+            if (value !== req.body.password) {
+                throw new Error('Password confirmation is incorrect');
             }
-        }),
-    check('cpassword').not().isEmpty()
+            return true;
+        }).trim().escape(),
+    check('email', 'Email is required').not().isEmpty().isEmail().withMessage('Email is not valid').trim().escape()
 ], async (req, res) => {
-    let email = req.body.email;
-    let password = req.body.password;
-    let cpassword = req.body.cpassword;
-    let name = req.body.name;
-
-    // Check if this user already exisits
+    const email = req.body.email;
+    const password = req.body.password;
+    const name = req.body.name;
+    //Check if this user already exisits
     let user = await User.findOne({ email: email });
     if (user) {
-        return res.status(422).send('That user already exisits!');
+        return res.status(422).send('-1');
     } else {
+        let errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(422).json(errors.array());
+        }
         // Insert the new user if they do not exist yet
         user = new User({
             name: name,
@@ -40,13 +42,6 @@ router.post('/signup', [
             }
             res.send(user);
         });
-        // user = new User({
-        //     name: req.body.name,
-        //     email: req.body.email,
-        //     password: req.body.password
-        // });
-        // await user.save();
-        // res.send(user);
     }
 });
 

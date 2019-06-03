@@ -8,7 +8,7 @@ const User = mongoose.model('User', new mongoose.Schema({
         type: String,
         required: true,
         minlength: 5,
-        maxlength: 50
+        maxlength: 120
     },
     email: {
         type: String,
@@ -21,7 +21,7 @@ const User = mongoose.model('User', new mongoose.Schema({
         type: String,
         required: true,
         minlength: 5,
-        maxlength: 1024
+        maxlength: 255
     },
     todos: {
         type: Array,

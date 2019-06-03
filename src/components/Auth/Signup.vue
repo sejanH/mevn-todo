@@ -13,65 +13,62 @@
       </p>
     </div>
     <div class="col-md-5">
+      <u style="color: maroon ;font-weight:600">
+        Signup
+        <small>(All fields are mandatory)</small>
+      </u>
       <form class="signup-form" v-bind:model="signupForm" v-on:submit.prevent="CreateNewUser">
-        <u>
-          Signup
-          <small>(All fields are mandatory)</small>
-        </u>
         <div class="form-group">
-          <label for="inputEmail3" class="col-form-label font-weight-bold">Email</label>
+          <label for="email" class="col-form-label font-weight-bold">Email</label>
           <input
             type="text"
             name="email"
             :class="[errorMsg.email?'is-invalid':'is-valid','form-control']"
-            id="inputEmail3"
+            id="email"
             placeholder="Your valid email"
             autocomplete="new-email"
             v-model="signupForm.email"
           >
-          <span class="error text-danger" v-if="errorMsg.email">{{errorMsg.email}}</span>
+          <span class="error" v-if="errorMsg.email">{{errorMsg.email}}</span>
         </div>
         <div class="form-group">
-          <label for="inputName" class="col-form-label font-weight-bold">Name</label>
+          <label for="name" class="col-form-label font-weight-bold">Name</label>
           <input
             type="text"
             :class="[errorMsg.name?'is-invalid':'is-valid','form-control']"
-            id="inputName"
+            id="name"
             name="name"
             placeholder="Your Full Name"
             autocomplete="new-password"
             v-model="signupForm.name"
           >
-          <span class="error text-danger" v-if="errorMsg.name">{{errorMsg.name}}</span>
+          <span class="error" v-if="errorMsg.name">{{errorMsg.name}}</span>
         </div>
         <div class="form-group">
-          <label for="inputPassword3" class="col-form-label font-weight-bold">Password</label>
+          <label for="password" class="col-form-label font-weight-bold">Password</label>
           <input
             type="password"
             name="password"
             :class="[errorMsg.password?'is-invalid':'is-valid','form-control']"
-            id="inputPassword3"
+            id="password"
             placeholder="Password must be 6 characters long"
             autocomplete="new-password"
             v-model="signupForm.password"
           >
-          <span class="error text-danger" v-if="errorMsg.password">{{errorMsg.password}}</span>
+          <span class="error" v-if="errorMsg.password">{{errorMsg.password}}</span>
         </div>
         <div class="form-group">
-          <label
-            for="inputPasswordConfirm3"
-            class="col-form-label font-weight-bold"
-          >Confirm Password</label>
+          <label for="cpassword" class="col-form-label font-weight-bold">Confirm Password</label>
           <input
             type="password"
             name="cpassword"
             :class="[errorMsg.cpassword?'is-invalid':'is-valid','form-control']"
-            id="inputPasswordConfirm3"
+            id="cpassword"
             placeholder="Enter Password Again"
             autocomplete="new-password"
             v-model="signupForm.cpassword"
           >
-          <span class="error text-danger" v-if="errorMsg.cpassword">{{errorMsg.cpassword}}</span>
+          <span class="error" v-if="errorMsg.cpassword">{{errorMsg.cpassword}}</span>
         </div>
         <div class="form-group">
           <button type="submit" class="btn btn-outline-danger">Join Now !</button>
@@ -103,15 +100,22 @@ export default {
   },
   methods: {
     CreateNewUser() {
-      let valid = true; //this.Validated(this.signupForm);
+      let valid = this.Validated(this.signupForm);
       if (valid == true) {
         axios
-          .post("http://localhost:8081/user/signup", this.signupForm)
+          .post("http://localhost:8081/user/new", this.signupForm)
           .then(response => {
             console.log(response.data);
           })
           .catch(error => {
-            console.log(error.request.response);
+            this.errorMsg = {};
+            if (error.request.response != -1) {
+              JSON.parse(error.request.response).forEach(value => {
+                this.errorMsg[value.param] = value.msg;
+              });
+            } else {
+              this.errorMsg["email"] = "This email already exists";
+            }
           });
       }
     },
@@ -176,5 +180,8 @@ form.signup-form {
 }
 .error {
   text-transform: capitalize;
+  font-weight: 400;
+  color: cyan;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
 }
 </style>

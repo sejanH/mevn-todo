@@ -10,7 +10,7 @@ const db = mongoose.connection;
 const app = express()
 app.use(morgan('combined'))
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 const baseUrl = process.env.NEXT_STATIC_BASE_URL || "http://localhost:8081";
 let options = {
     'Access-Control-Allow-Origin': '*',
