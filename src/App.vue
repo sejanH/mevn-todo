@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Navbar></Navbar>
+    <Navbar :key="$route.fullPath"></Navbar>
     <div class="container-fluid">
       <router-view></router-view>
     </div>
@@ -8,11 +8,37 @@
 </template>
 
 <script>
-import Navbar from "./components/Partials/Navbar";
-export default {
-  name: "app",
-  components: { Navbar }
-};
+  import Navbar from "./components/Partials/Navbar";
+  export default {
+    name: "app",
+    components: { Navbar },
+    data(){
+      return{
+        isLogged: this.checkIfIsLogged()
+      }
+    },
+    watch:{
+      isLogged(val){
+        this.isLogged = val;
+      }
+    },
+    methods:{
+      forceRerender() {
+        this.isLogged = this.checkIfIsLogged ();  
+      },
+      checkIfIsLogged () {
+        let token = localStorage.getItem('token')
+        if (token) {
+          return true
+        } else {
+          return false
+        }
+      }
+    },
+    mounted(){
+      this.checkIfIsLogged();
+    }
+  };
 </script>
 <style>
 html,

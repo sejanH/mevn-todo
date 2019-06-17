@@ -79,6 +79,7 @@
 </template>
 <script>
 /* eslint-disable */
+import swal from "sweetalert";
 import { log } from "util";
 export default {
   name: "signup",
@@ -100,14 +101,27 @@ export default {
   },
   methods: {
     CreateNewUser() {
-      let valid = this.Validated(this.signupForm);
+      let valid = true;//this.Validated(this.signupForm);
       if (valid == true) {
         axios
-          .post("http://localhost:8081/user/new", this.signupForm)
+          .post("http://localhost:8081/user/signup", this.signupForm)
           .then(response => {
-            console.log(response.data);
+            if (response.data.id != -1) {
+              swal({
+                icon: "success",
+                timer: 1500
+              });
+              this.signupForm = {
+                email: "",
+                name: "",
+                password: "",
+                cpassword: ""
+              };
+              this.errorMsg = {};
+            }
           })
           .catch(error => {
+            console.log(error);
             this.errorMsg = {};
             if (error.request.response != -1) {
               JSON.parse(error.request.response).forEach(value => {

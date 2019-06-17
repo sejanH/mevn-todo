@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-mongoose.connect('mongodb://mevn:xxxxxx00@ds143342.mlab.com:43342/mevn-todo', { useNewUrlParser: true });
+const jwt = require('jsonwebtoken');
+
+mongoose.connect(process.env.DB_HOST + process.env.DB_NAME, { useNewUrlParser: true });
 var db = mongoose.connection;
 
 const User = mongoose.model('User', new mongoose.Schema({
@@ -8,7 +10,7 @@ const User = mongoose.model('User', new mongoose.Schema({
         type: String,
         required: true,
         minlength: 5,
-        maxlength: 120
+        maxlength: 50
     },
     email: {
         type: String,
@@ -21,7 +23,7 @@ const User = mongoose.model('User', new mongoose.Schema({
         type: String,
         required: true,
         minlength: 5,
-        maxlength: 255
+        maxlength: 1024
     },
     todos: {
         type: Array,
@@ -31,12 +33,31 @@ const User = mongoose.model('User', new mongoose.Schema({
 
 
 
-exports.User = User;
+module.exports.UserSchema = User;
 
-exports.createUser = function (newUser, callback) {
-    bcrypt.hash(newUser.password, 10, function (err, hash) {
+module.exports.createUser = function (newUser, callback) {
+    bcrypt.hash(newUser.password, parseInt(process.env.SALT), function (err, hash) {
         if (err) throw err;
         newUser.password = hash;
         newUser.save(callback);
     });
 }
+
+module.exports.getUserByEmail = (email, callback) => {
+    User.findOne({ email }, callback);
+}
+module.exports.comparePassword = (plaintext, user, callback) => {
+    bcrypt.compare(plaintext, user.password, (err, isMatch) => {
+        if (err) return callback(err);
+        //console.log(isMatch)
+        let token = null
+        let userId = null
+        if (isMatch) {
+            userId = user.id;
+            token = jwt.sign({ id: user.id }, 'secretkey', { expiresIn: 86400 });
+            callback(null, { isMatch, token });
+        } else {
+            callback(null, isMatch);
+        }
+    });
+};

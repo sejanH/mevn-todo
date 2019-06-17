@@ -16,7 +16,7 @@
             autocomplete="new-email"
             v-model="loginForm.email"
           >
-          <span class="error text-danger">{{errorLog.email}}</span>
+          <span class="error text-danger">{{errorLog['email']}}</span>
         </div>
         <div class="form-group">
           <label for="inputPassword3" class="font-weight-bold col-form-label">Password</label>
@@ -28,7 +28,7 @@
             autocomplete="new-password"
             v-model="loginForm.password"
           >
-          <span class="error text-danger">{{errorLog.password}}</span>
+          <span class="error text-danger">{{errorLog['password']}}</span>
         </div>
         <div class="form-group">
           <button type="submit" class="btn btn-info">Login</button>
@@ -38,6 +38,7 @@
   </div>
 </template>
 <script>
+import swal from "sweetalert";
 export default {
   name: "login",
   data() {
@@ -59,6 +60,32 @@ export default {
       let valid = this.ValidateInput(this.loginForm);
       if (valid) {
         /*perform login*/
+        axios
+          .post("http://localhost:8081/user/login", this.loginForm)
+          .then(response => {
+            if (response.data.isMatch == true) {
+              localStorage.setItem("token", response.data.token);
+              swal({
+                icon: "success",
+                text: "Logged in",
+                timer: 1500,
+                button: false
+              });
+              //window.location.reload()
+              this.$router.push({ path: "/todo-list" });
+            } else {
+              this.loginForm.password = "";
+            }
+          })
+          .catch(err => {
+            this.errorLog = {};
+            let errParsed = JSON.parse(err.request.response);
+            if (errParsed.email) {
+              this.errorLog.email = errParsed.email;
+            } else {
+              this.errorLog.password = errParsed.password;
+            }
+          });
       }
     },
     ValidateInput(data) {
