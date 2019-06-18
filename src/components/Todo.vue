@@ -10,7 +10,7 @@
 
       <div class="frame smart" id="smart">
         <ul class="items">
-          <li v-for="todo in todos">{{todo.id}}</li>
+          <li v-for="todo in todos" v-bind:key="todo.id">{{todo.id}}</li>
         </ul>
       </div>
     </div>
@@ -40,6 +40,11 @@ export default {
         plugin.setAttribute("src", "/js/sly.min.js");
         plugin.async = true;
         document.head.appendChild(plugin);
+      })
+      .catch(err => {
+        if (err.request.response == "expired") {
+          this.$root.$emit("expired");
+        }
       });
   },
   mounted() {}

@@ -44,6 +44,9 @@ app.get('/posts', (req, res) => {
         ]
     )
 });
+// app.get('/',(req,res)=>{
+
+// });
 const todos = require('./routes/todos');
 const users = require('./routes/users');
 app.use('/user', users);

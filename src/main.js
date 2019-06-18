@@ -23,6 +23,7 @@ Vue.config.productionTip = false
 /* Components */
 import Home from './components/Home'
 import Todo from './components/Todo'
+import Newtodo from './components/NewTodo'
 import Login from './components/Auth/Login'
 import Signup from './components/Auth/Signup'
 
@@ -42,6 +43,9 @@ const routes = [
   {
     name: 'signup', path: '/join', component: Signup, meta: { title: 'Signup', requiresAuth: false }
   },
+  {
+    name: 'new-todo', path: '/todo-list/new', component: Newtodo, meta: { title: 'Add new', requiresAuth: true, hideFromNav: true }
+  }
   // { 
   //   name:'logout',path:'/logout',beforeEnter(){
   //     let user = localStorage.getItem('user');

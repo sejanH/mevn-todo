@@ -16,12 +16,34 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item" v-bind:key="nav.name" v-for="nav in NavLinks">
+          <li
+            :class="[nav.name=='todo' ? 'dropdown':'',' nav-item']"
+            v-bind:key="nav.name"
+            v-for="nav in NavLinks"
+          >
             <router-link
-              v-if="nav.show == true"
+              v-if="nav.show == true && nav.name!='todo'"
               class="nav-link"
               :to="{name:nav.name}"
             >{{nav.title}}</router-link>
+            <span v-else-if="nav.show == true && nav.name=='todo'" class="input-group">
+              <router-link class="nav-link input-group-prepend" :to="{name:nav.name}">{{nav.title}}</router-link>
+              <button
+                type="button"
+                class="btn dropdown-toggle dropdown-toggle-split"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="#">Action</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Something else here</a>
+              </div>
+            </span>
           </li>
           <li class="nav-item" v-if="isLogged">
             <a href="#logout" class="nav-link" v-on:click="doLogout()">Logout</a>
@@ -45,36 +67,38 @@ export default {
   created() {
     this.checkIfIsLogged();
     this.$router.options.routes.forEach(route => {
-      if (route.name == "login" || route.name == "signup") {
-        if (localStorage.getItem("token") == null) {
-          this.NavLinks.push({
-            name: route.name,
-            title: route.meta.title,
-            show: true
-          });
-        } else {
+      if (!route.meta.hideFromNav) {
+        if (route.name == "login" || route.name == "signup") {
+          if (localStorage.getItem("token") == null) {
+            this.NavLinks.push({
+              name: route.name,
+              title: route.meta.title,
+              show: true
+            });
+          } else {
+            this.NavLinks.push({
+              name: route.name,
+              title: route.meta.title,
+              show: false
+            });
+          }
+        } else if (
+          localStorage.getItem("token") == null &&
+          (route.name != "login" || route.name != "signup") &&
+          route.meta.requiresAuth == true
+        ) {
           this.NavLinks.push({
             name: route.name,
             title: route.meta.title,
             show: false
           });
+        } else {
+          this.NavLinks.push({
+            name: route.name,
+            title: route.meta.title,
+            show: true
+          });
         }
-      } else if (
-        localStorage.getItem("token") == null &&
-        (route.name != "login" || route.name != "signup") &&
-        route.meta.requiresAuth == true
-      ) {
-        this.NavLinks.push({
-          name: route.name,
-          title: route.meta.title,
-          show: false
-        });
-      } else {
-        this.NavLinks.push({
-          name: route.name,
-          title: route.meta.title,
-          show: true
-        });
       }
     });
   },
@@ -114,6 +138,13 @@ export default {
         return false;
       }
     }
+  },
+  mounted() {
+    this.$root.$on("expired", () => {
+      swal({ text: "Session expired!", button: false, timer: 1000 });
+      localStorage.removeItem("token");
+      this.$router.push({ path: "/" });
+    });
   }
 };
 </script>

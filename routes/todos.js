@@ -6,10 +6,16 @@ const jwt = require('jsonwebtoken');
 
 
 router.get('/my-todos', (req, res) => {
-    var decoded = jwt.verify(req.query.token, 'secretkey');
-    Todo.findTodoById(decoded.id, (err, todo) => {
-        if (err) throw err;
-        res.send(todo.todos);
+    jwt.verify(req.query.token, 'secretkey', (err, data) => {
+        if (err) {
+            res.status(401).send('expired');
+            throw err;
+        } else {
+            Todo.findTodoById(data.id, (err, todo) => {
+                if (err) throw err;
+                res.send(todo.todos);
+            });
+        }
     });
 });
 

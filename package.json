@@ -34,7 +34,8 @@
     "serve-favicon": "~2.4.2",
     "sweetalert": "^2.1.2",
     "vue": "^2.6.10",
-    "vue-router": "^3.0.6"
+    "vue-router": "^3.0.6",
+    "vuedraggable": "^2.21.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.8.0",
