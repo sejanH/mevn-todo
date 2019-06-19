@@ -35,7 +35,12 @@ const routes = [
     }
   },
   {
-    name: 'todo', path: '/todo-list', component: Todo, meta: { title: 'Todo-List', requiresAuth: true }
+    name: 'todo', path: '/todo-list', component: Todo, meta: { title: 'Todo-List', requiresAuth: true },
+    children: [
+      {
+        name: 'new-todo', path: 'new', component: Newtodo, meta: { title: 'Add new', requiresAuth: true, hideFromNav: true }
+      }
+    ]
   },
   {
     name: 'login', path: '/login', component: Login, meta: { title: 'Login', requiresAuth: false }
@@ -43,9 +48,9 @@ const routes = [
   {
     name: 'signup', path: '/join', component: Signup, meta: { title: 'Signup', requiresAuth: false }
   },
-  {
-    name: 'new-todo', path: '/todo-list/new', component: Newtodo, meta: { title: 'Add new', requiresAuth: true, hideFromNav: true }
-  }
+  // {
+  //   name: 'new-todo', path: '/todo-list/new', component: Newtodo, meta: { title: 'Add new', requiresAuth: true, hideFromNav: true }
+  // }
   // { 
   //   name:'logout',path:'/logout',beforeEnter(){
   //     let user = localStorage.getItem('user');

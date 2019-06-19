@@ -1,21 +1,39 @@
 <template>
-  <div id="todo" class="row justify-content-center">
-    <div class="col-md-3" id="todo-list">
-      <h6>Select one</h6>
-      <div class="scrollbar">
-        <div class="handle">
-          <div class="mousearea"></div>
+  <div>
+    <div id="todo" class="row justify-content-center">
+      <div class="col-md-3" id="todo-list">
+        <h6>Select one</h6>
+        <div class="scrollbar">
+          <div class="handle">
+            <div class="mousearea"></div>
+          </div>
+        </div>
+
+        <div class="frame smart" id="smart">
+          <ul class="items">
+            <li v-for="todo in todos" v-bind:key="todo.id" @click="showTodo(todo.id)">
+              {{todo.id}} -
+              <small>{{todo.title }}</small>
+            </li>
+          </ul>
         </div>
       </div>
-
-      <div class="frame smart" id="smart">
-        <ul class="items">
-          <li v-for="todo in todos" v-bind:key="todo.id">{{todo.id}}</li>
+      <div class="col-md-8" v-if="$route.name=='todo'">
+        <h5 :class="[selectedTodo.deleted ? 'strike':'']">{{selectedTodo.title}}</h5>
+        <ul class="list-group">
+          <li :class="[selectedTodo.deleted ? 'strike':'','list-group-item']">{{selectedTodo.title}}</li>
+          <button class="btn-secondary">
+            <i class="fas fa-plus-circle"></i>
+          </button>
+          <li :class="[selectedTodo.deleted ? 'strike':'','list-group-item']">
+            {{selectedTodo.body}} -
+            <small>{{selectedTodo.created_at}}</small>
+          </li>
         </ul>
       </div>
-    </div>
-    <div class="col-md-8">
-      <ul class="list-group"></ul>
+      <div class="col-md-8" v-else>
+        <router-view></router-view>
+      </div>
     </div>
   </div>
 </template>
@@ -24,28 +42,39 @@ export default {
   name: "todo",
   data() {
     return {
-      todos: []
+      todos: [],
+      selectedTodo: []
     };
   },
   created() {
-    axios
-      .get("http://localhost:8081/api/my-todos", {
-        params: {
-          token: localStorage.getItem("token")
-        }
-      })
-      .then(res => {
-        this.todos = res.data;
-        const plugin = document.createElement("script");
-        plugin.setAttribute("src", "/js/sly.min.js");
-        plugin.async = true;
-        document.head.appendChild(plugin);
-      })
-      .catch(err => {
-        if (err.request.response == "expired") {
-          this.$root.$emit("expired");
-        }
-      });
+    this.getTodo();
+  },
+  methods: {
+    async getTodo() {
+      await axios
+        .get("http://localhost:8081/api/my-todos", {
+          params: {
+            token: localStorage.getItem("token")
+          }
+        })
+        .then(res => {
+          this.todos = res.data;
+          const plugin = document.createElement("script");
+          plugin.setAttribute("src", "/js/sly.min.js");
+          plugin.async = true;
+          document.head.appendChild(plugin);
+          this.showTodo(this.todos[0].id);
+        })
+        .catch(err => {
+          if (err.request.response == "expired") {
+            this.$root.$emit("expired");
+          }
+        });
+    },
+    showTodo(todoId) {
+      let todo = this.todos.filter(data => data.id == todoId)[0];
+      this.selectedTodo = todo;
+    }
   },
   mounted() {}
 };
@@ -85,13 +114,13 @@ h5 {
   margin: 0;
   padding: 0;
   width: 98%;
-  font-size: 24px;
-  line-height: 100px;
+  font-size: 20px;
+  line-height: 80px;
 }
 .frame ul.items li {
   float: left;
   width: 100%;
-  height: 100px;
+  height: 80px;
   border-bottom: 1px solid grey;
   padding: 0;
   text-align: center;
@@ -127,5 +156,8 @@ h5 {
   left: -10px;
   width: 22px;
   height: 100%;
+}
+.strike {
+  text-decoration: line-through;
 }
 </style>

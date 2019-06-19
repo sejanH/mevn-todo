@@ -38,10 +38,7 @@
                 <span class="sr-only">Toggle Dropdown</span>
               </button>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="#">Action</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Something else here</a>
+                <router-link :to="{name:'new-todo'}" class="dropdown-item">Add new</router-link>
               </div>
             </span>
           </li>
