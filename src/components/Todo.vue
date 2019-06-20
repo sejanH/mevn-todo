@@ -11,25 +11,35 @@
 
         <div class="frame smart" id="smart">
           <ul class="items">
-            <li v-for="todo in todos" v-bind:key="todo.id" @click="showTodo(todo.id)">
+            <li v-for="todo in parentTodo" v-bind:key="todo.id" @click="showTodo(todo.id)">
               {{todo.id}} -
               <small>{{todo.title }}</small>
             </li>
           </ul>
         </div>
       </div>
+      <br>
       <div class="col-md-8" v-if="$route.name=='todo'">
-        <h5 :class="[selectedTodo.deleted ? 'strike':'']">{{selectedTodo.title}}</h5>
-        <ul class="list-group">
+        <!-- <h5 :class="[  selectedTodo[0].deleted ? 'strike':'']">{{selectedTodo[0].title}}</h5> -->
+        <!-- <ul class="list-group">
           <li :class="[selectedTodo.deleted ? 'strike':'','list-group-item']">{{selectedTodo.title}}</li>
-          <button class="btn-secondary">
+          <button class="btn btn-secondary">
             <i class="fas fa-plus-circle"></i>
           </button>
           <li :class="[selectedTodo.deleted ? 'strike':'','list-group-item']">
             {{selectedTodo.body}} -
             <small>{{selectedTodo.created_at}}</small>
           </li>
-        </ul>
+        </ul>-->
+        <draggable tag="span" v-model="selectedTodo" v-bind="dragOptions" :move="onMove">
+          <transition-group name="no" class="list-group" tag="ul">
+            <li
+              :class="[element.deleted ? 'strike':'','list-group-item']"
+              v-for="element in selectedTodo"
+              :key="element.id"
+            >{{element}}</li>
+          </transition-group>
+        </draggable>
       </div>
       <div class="col-md-8" v-else>
         <router-view></router-view>
@@ -38,13 +48,33 @@
   </div>
 </template>
 <script>
+import draggable from "vuedraggable";
 export default {
   name: "todo",
   data() {
     return {
       todos: [],
-      selectedTodo: []
+      list: [],
+      parentTodo: [],
+      selectedTodo: [],
+      editable: true,
+      isDragging: false,
+      delayedDragging: false
     };
+  },
+  watch: {
+    isDragging(newValue) {
+      if (newValue) {
+        this.delayedDragging = true;
+        return;
+      }
+      this.$nextTick(() => {
+        this.delayedDragging = false;
+      });
+    }
+  },
+  components: {
+    draggable
   },
   created() {
     this.getTodo();
@@ -59,6 +89,7 @@ export default {
         })
         .then(res => {
           this.todos = res.data;
+          this.parentTodo = res.data.filter(data => data.parent == 0);
           const plugin = document.createElement("script");
           plugin.setAttribute("src", "/js/sly.min.js");
           plugin.async = true;
@@ -72,11 +103,42 @@ export default {
         });
     },
     showTodo(todoId) {
-      let todo = this.todos.filter(data => data.id == todoId)[0];
-      this.selectedTodo = todo;
+      this.selectedTodo = [];
+      this.list = this.todos.map((body, index) => {
+        return { body, order: index + 1, fixed: false };
+      });
+      let todo = [];
+      todo[0] = this.todos.filter(data => data.id == todoId)[0];
+      todo[1] =
+        this.todos.filter(data => data.parent == todoId).length > 0
+          ? this.todos.filter(data => data.parent == todoId)
+          : [];
+      this.selectedTodo.push(todo);
+    },
+    orderList() {
+      this.list = this.list.sort((one, two) => {
+        return one.order - two.order;
+      });
+    },
+    onMove({ relatedContext, draggedContext }) {
+      const relatedElement = relatedContext.element;
+      const draggedElement = draggedContext.element;
+      return (
+        (!relatedElement || !relatedElement.fixed) && !draggedElement.fixed
+      );
     }
   },
-  mounted() {}
+  mounted() {},
+  computed: {
+    dragOptions() {
+      return {
+        animation: 0,
+        group: "description",
+        disabled: !this.editable,
+        ghostClass: "ghost"
+      };
+    }
+  }
 };
 </script>
 
@@ -159,5 +221,25 @@ h5 {
 }
 .strike {
   text-decoration: line-through;
+}
+/* draggable css*/
+.flip-list-move {
+  transition: transform 0.5s;
+}
+.no-move {
+  transition: transform 0s;
+}
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
+}
+.list-group {
+  min-height: 20px;
+}
+.list-group-item {
+  cursor: move;
+}
+.list-group-item i {
+  cursor: pointer;
 }
 </style>
