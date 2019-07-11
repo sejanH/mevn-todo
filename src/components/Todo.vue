@@ -18,7 +18,7 @@
           </ul>
         </div>
       </div>
-      <br>
+      <br />
       <div class="col-md-8" v-if="$route.name=='todo'">
         <!-- <h5 :class="[  selectedTodo[0].deleted ? 'strike':'']">{{selectedTodo[0].title}}</h5> -->
         <!-- <ul class="list-group">
@@ -31,13 +31,17 @@
             <small>{{selectedTodo.created_at}}</small>
           </li>
         </ul>-->
+        <h6 v-if="selectedTodo.length !== 0">
+          {{selectedTodo[0][0].title}}-
+          <small>{{selectedTodo[0][0].body}}</small>
+        </h6>
         <draggable tag="span" v-model="selectedTodo" v-bind="dragOptions" :move="onMove">
           <transition-group name="no" class="list-group" tag="ul">
             <li
+              v-for="(element,index) in selectedTodo"
+              :key="index"
               :class="[element.deleted ? 'strike':'','list-group-item']"
-              v-for="element in selectedTodo"
-              :key="element.id"
-            >{{element}}</li>
+            >{{element[1]}}</li>
           </transition-group>
         </draggable>
       </div>
@@ -114,6 +118,7 @@ export default {
           ? this.todos.filter(data => data.parent == todoId)
           : [];
       this.selectedTodo.push(todo);
+      //this.selectedTodo = todo;
     },
     orderList() {
       this.list = this.list.sort((one, two) => {
