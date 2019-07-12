@@ -31,18 +31,32 @@
             <small>{{selectedTodo.created_at}}</small>
           </li>
         </ul>-->
-        <h6 v-if="selectedTodo.length !== 0">
-          {{selectedTodo[0][0].title}}-
-          <small>{{selectedTodo[0][0].body}}</small>
-        </h6>
-        <draggable tag="span" v-model="selectedTodo" v-bind="dragOptions" :move="onMove">
+        <h5 v-if="selectedTodo.length !== 0" :class="[selectedTodo[0].deleted ? 'strike':'','']">
+          {{selectedTodo[0].title}}-
+          <small>{{selectedTodo[0].body}}</small>
+        </h5>
+        <!-- <draggable tag="span" v-model="selectedTodo" v-bind="dragOptions" :move="onMove">
           <transition-group name="no" class="list-group" tag="ul">
             <li
-              v-for="(element,index) in selectedTodo"
-              :key="index"
+              v-for="(element,index) in selectedTodo[1]"
+              :key="element.id"
               :class="[element.deleted ? 'strike':'','list-group-item']"
-            >{{element[1]}}</li>
+            >{{index+1+") "+element.title+"-"+element.body+"-"+element.created_at}}</li>
           </transition-group>
+        </draggable>-->
+
+        <draggable
+          :list="selectedTodo[1]"
+          class="list-group"
+          ghost-class="ghost"
+          @start="dragging = true"
+          @end="dragging = false"
+        >
+          <div
+            class="list-group-item"
+            v-for="element in selectedTodo[1]"
+            :key="element.id"
+          >{{ element.title }}</div>
         </draggable>
       </div>
       <div class="col-md-8" v-else>
@@ -117,8 +131,8 @@ export default {
         this.todos.filter(data => data.parent == todoId).length > 0
           ? this.todos.filter(data => data.parent == todoId)
           : [];
-      this.selectedTodo.push(todo);
-      //this.selectedTodo = todo;
+      //this.selectedTodo.push(todo);
+      this.selectedTodo = todo;
     },
     orderList() {
       this.list = this.list.sort((one, two) => {
