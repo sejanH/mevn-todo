@@ -53,10 +53,23 @@
           @end="dragging = false"
         >
           <div
-            class="list-group-item"
+            :class="[element.deleted?'strike':'','list-group-item']"
             v-for="element in selectedTodo[1]"
             :key="element.id"
-          >{{ element.title }}</div>
+          >
+            {{ element.title }}
+            <span class="actions">
+              <div class="form-check" title="mark as complete">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  :value="element.id"
+                  :id="'complete_'+element.id"
+                />
+                <label class="form-check-label" :for="'complete_'+element.id">&#10004;</label>
+              </div>
+            </span>
+          </div>
         </draggable>
       </div>
       <div class="col-md-8" v-else>
@@ -127,10 +140,11 @@ export default {
       });
       let todo = [];
       todo[0] = this.todos.filter(data => data.id == todoId)[0];
-      todo[1] =
-        this.todos.filter(data => data.parent == todoId).length > 0
-          ? this.todos.filter(data => data.parent == todoId)
-          : [];
+      // todo[1] =
+      //   this.todos.filter(data => data.parent == todoId).length > 0
+      //     ? this.todos.filter(data => data.parent == todoId)[0].tasks
+      //     : [];
+      todo[1] = todo[0].tasks;
       //this.selectedTodo.push(todo);
       this.selectedTodo = todo;
     },
@@ -240,6 +254,9 @@ h5 {
 }
 .strike {
   text-decoration: line-through;
+}
+span.actions {
+  float: right;
 }
 /* draggable css*/
 .flip-list-move {
