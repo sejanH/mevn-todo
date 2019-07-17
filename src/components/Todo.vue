@@ -19,31 +19,24 @@
         </div>
       </div>
       <br />
-      <div class="col-md-8" v-if="$route.name=='todo'">
-        <!-- <h5 :class="[  selectedTodo[0].deleted ? 'strike':'']">{{selectedTodo[0].title}}</h5> -->
-        <!-- <ul class="list-group">
-          <li :class="[selectedTodo.deleted ? 'strike':'','list-group-item']">{{selectedTodo.title}}</li>
-          <button class="btn btn-secondary">
-            <i class="fas fa-plus-circle"></i>
-          </button>
-          <li :class="[selectedTodo.deleted ? 'strike':'','list-group-item']">
-            {{selectedTodo.body}} -
-            <small>{{selectedTodo.created_at}}</small>
-          </li>
-        </ul>-->
-        <h5 v-if="selectedTodo.length !== 0" :class="[selectedTodo[0].deleted ? 'strike':'','']">
-          {{selectedTodo[0].title}}-
-          <small>{{selectedTodo[0].body}}</small>
-        </h5>
-        <!-- <draggable tag="span" v-model="selectedTodo" v-bind="dragOptions" :move="onMove">
-          <transition-group name="no" class="list-group" tag="ul">
-            <li
-              v-for="(element,index) in selectedTodo[1]"
-              :key="element.id"
-              :class="[element.deleted ? 'strike':'','list-group-item']"
-            >{{index+1+") "+element.title+"-"+element.body+"-"+element.created_at}}</li>
-          </transition-group>
-        </draggable>-->
+      <div class="col-md-8 col-xs-11 col-sm-11" v-if="$route.name=='todo'">
+        <table class="table table-borderless table-sm">
+          <tr>
+            <td>
+              <h5
+                v-if="selectedTodo.length !== 0"
+                :class="[selectedTodo[0].deleted ? 'strike':'','']"
+              >
+                {{selectedTodo[0].title}}-
+                <small>{{selectedTodo[0].body}}</small>
+              </h5>
+            </td>
+            <td
+              v-if="selectedTodo.length !== 0"
+              style="float:right;font-size:0.75rem;display : flex;align-items : center;"
+            >{{selectedTodo[0].created_at}}</td>
+          </tr>
+        </table>
 
         <draggable
           :list="selectedTodo[1]"
@@ -57,22 +50,32 @@
             v-for="element in selectedTodo[1]"
             :key="element.id"
           >
-            {{ element.title }}
+            {{ element.title }} -
+            <small>{{element.body}}</small>
             <span class="actions">
-              <div class="form-check" title="mark as complete">
+              <span style="display:block;font-size:" v-if="!element.deleted">{{element.created_at}}</span>
+              <div class="custom-control custom-checkbox" title="mark as complete">
                 <input
-                  class="form-check-input"
+                  class="custom-control-input"
                   type="checkbox"
                   :value="element.id"
                   :id="'complete_'+element.id"
                 />
-                <label class="form-check-label" :for="'complete_'+element.id">&#10004;</label>
+                <label class="custom-control-label" :for="'complete_'+element.id">&#10004;</label>
               </div>
             </span>
+            <div
+              v-for="sub1 in element.tasks"
+              v-bind:key="sub1.id"
+              :class="[sub1.deleted?'strike':'','list-group-item']"
+            >
+              {{ sub1.title }} -
+              <small>{{sub1.body}}</small>
+            </div>
           </div>
         </draggable>
       </div>
-      <div class="col-md-8" v-else>
+      <div class="col-md-8 col-xs-11 col-sm-11" v-else>
         <router-view></router-view>
       </div>
     </div>
@@ -140,12 +143,7 @@ export default {
       });
       let todo = [];
       todo[0] = this.todos.filter(data => data.id == todoId)[0];
-      // todo[1] =
-      //   this.todos.filter(data => data.parent == todoId).length > 0
-      //     ? this.todos.filter(data => data.parent == todoId)[0].tasks
-      //     : [];
       todo[1] = todo[0].tasks;
-      //this.selectedTodo.push(todo);
       this.selectedTodo = todo;
     },
     orderList() {
