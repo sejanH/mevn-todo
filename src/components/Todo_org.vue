@@ -37,20 +37,57 @@
             >{{selectedTodo[0].created_at}}</td>
           </tr>
         </table>
-        <div v-if="parentTodo.length > 0">
-          <nested-draggable :tasks="selectedTodo[1]" />
-        </div>
-        <div class="text-center centered" v-else>
-          <div class="spinner-grow text-danger" role="status">
-            <span class="sr-only">Loading...</span>
-          </div>
-        </div>
 
-        <!-- <div
-          class="alert alert-warning"
-          role="alert"
-          v-if="parentTodo.length ===0"
-        >Hi No Todo Found by your name</div>-->
+        <draggable
+          :list="selectedTodo[1]"
+          class="list-group"
+          ghost-class="ghost"
+          @start="dragging = true"
+          @end="dragging = false"
+        >
+          <div
+            :class="[element.deleted?'strike':'','list-group-item']"
+            v-for="element in selectedTodo[1]"
+            :key="element.id"
+          >
+            {{ element.title }} -
+            <small>{{element.body}}</small>
+            <span class="actions">
+              <span style="display:block;font-size:" v-if="!element.deleted">{{element.created_at}}</span>
+              <div class="custom-control custom-checkbox" title="mark as complete">
+                <input
+                  class="custom-control-input"
+                  type="checkbox"
+                  :value="element.id"
+                  :id="'complete_'+element.id"
+                />
+                <label class="custom-control-label" :for="'complete_'+element.id">&#10004;</label>
+              </div>
+            </span>
+            <draggable :list="element.tasks" :group="{ name: 'g1' }" class="list-group">
+              <div
+                v-for="sub1 in element.tasks"
+                v-bind:key="sub1.id"
+                :class="[sub1.deleted?'strike':'','list-group-item']"
+              >
+                {{ sub1.title }} -
+                <small>{{sub1.body}}</small>
+                <!-- test -->
+                <draggable :list="sub1.tasks" :group="{ name: 'g2' }" class="list-group">
+                  <div
+                    v-for="sub2 in sub1.tasks"
+                    v-bind:key="sub2.id"
+                    :class="[sub2.deleted?'strike':'','list-group-item']"
+                  >
+                    {{ sub2.title }} -
+                    <small>{{sub2.body}}</small>
+                  </div>
+                </draggable>
+                <!-- end test -->
+              </div>
+            </draggable>
+          </div>
+        </draggable>
       </div>
       <div class="col-md-8 col-xs-11 col-sm-11" v-else>
         <router-view></router-view>
@@ -59,7 +96,7 @@
   </div>
 </template>
 <script>
-import nestedDraggable from "./Nested";
+import draggable from "vuedraggable";
 export default {
   name: "todo",
   data() {
@@ -85,7 +122,7 @@ export default {
     }
   },
   components: {
-    nestedDraggable
+    draggable
   },
   created() {
     this.getTodo();
@@ -113,7 +150,7 @@ export default {
           }
         });
     },
-    async showTodo(todoId) {
+    showTodo(todoId) {
       this.selectedTodo = [];
       this.list = this.todos.map((body, index) => {
         return { body, order: index + 1, fixed: false };
@@ -252,12 +289,5 @@ span.actions {
 }
 .list-group-item i {
   cursor: pointer;
-}
-div.centered {
-  position: relative;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
 }
 </style>
