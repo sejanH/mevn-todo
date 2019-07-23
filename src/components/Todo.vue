@@ -37,7 +37,7 @@
             >{{selectedTodo[0].created_at}}</td>
           </tr>
         </table>
-        <div v-if="parentTodo.length > 0">
+        <div v-if="parentTodo.length > 0 && parentTodo != -1">
           <nested-draggable :tasks="selectedTodo[1]" />
         </div>
         <div class="text-center centered" v-else>
@@ -46,11 +46,11 @@
           </div>
         </div>
 
-        <!-- <div
+        <div
           class="alert alert-warning"
           role="alert"
-          v-if="parentTodo.length ===0"
-        >Hi No Todo Found by your name</div>-->
+          v-if="parentTodo == -1"
+        >Hi No Todo Found by your name</div>
       </div>
       <div class="col-md-8 col-xs-11 col-sm-11" v-else>
         <router-view></router-view>
@@ -74,15 +74,15 @@ export default {
     };
   },
   watch: {
-    isDragging(newValue) {
-      if (newValue) {
-        this.delayedDragging = true;
-        return;
-      }
-      this.$nextTick(() => {
-        this.delayedDragging = false;
-      });
-    }
+    // isDragging(newValue) {
+    //   if (newValue) {
+    //     this.delayedDragging = true;
+    //     return;
+    //   }
+    //   this.$nextTick(() => {
+    //     this.delayedDragging = false;
+    //   });
+    // }
   },
   components: {
     nestedDraggable
@@ -99,13 +99,17 @@ export default {
           }
         })
         .then(res => {
-          this.todos = res.data;
-          this.parentTodo = res.data.filter(data => data.parent == 0);
-          const plugin = document.createElement("script");
-          plugin.setAttribute("src", "/js/sly.min.js");
-          plugin.async = true;
-          document.head.appendChild(plugin);
-          this.showTodo(this.todos[0].id);
+          if (res.data.length == 0) {
+            this.parentTodo = -1;
+          } else {
+            this.todos = res.data;
+            this.parentTodo = res.data.filter(data => data.parent == 0);
+            const plugin = document.createElement("script");
+            plugin.setAttribute("src", "/js/sly.min.js");
+            plugin.async = true;
+            document.head.appendChild(plugin);
+            this.showTodo(this.todos[0].id);
+          }
         })
         .catch(err => {
           if (err.request.response == "expired") {
@@ -113,7 +117,7 @@ export default {
           }
         });
     },
-    async showTodo(todoId) {
+    showTodo(todoId) {
       this.selectedTodo = [];
       this.list = this.todos.map((body, index) => {
         return { body, order: index + 1, fixed: false };
@@ -122,30 +126,30 @@ export default {
       todo[0] = this.todos.filter(data => data.id == todoId)[0];
       todo[1] = todo[0].tasks;
       this.selectedTodo = todo;
-    },
-    orderList() {
-      this.list = this.list.sort((one, two) => {
-        return one.order - two.order;
-      });
-    },
-    onMove({ relatedContext, draggedContext }) {
-      const relatedElement = relatedContext.element;
-      const draggedElement = draggedContext.element;
-      return (
-        (!relatedElement || !relatedElement.fixed) && !draggedElement.fixed
-      );
     }
+    // orderList() {
+    //   this.list = this.list.sort((one, two) => {
+    //     return one.order - two.order;
+    //   });
+    // },
+    // onMove({ relatedContext, draggedContext }) {
+    //   const relatedElement = relatedContext.element;
+    //   const draggedElement = draggedContext.element;
+    //   return (
+    //     (!relatedElement || !relatedElement.fixed) && !draggedElement.fixed
+    //   );
+    // }
   },
   mounted() {},
   computed: {
-    dragOptions() {
-      return {
-        animation: 0,
-        group: "description",
-        disabled: !this.editable,
-        ghostClass: "ghost"
-      };
-    }
+    // dragOptions() {
+    //   return {
+    //     animation: 0,
+    //     group: "description",
+    //     disabled: !this.editable,
+    //     ghostClass: "ghost"
+    //   };
+    // }
   }
 };
 </script>

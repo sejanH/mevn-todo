@@ -1,6 +1,13 @@
 <template>
-  <draggable class="list-group" ghost-class="ghost" tag="ul" :list="tasks" :group="{ name: 'g1' }">
-    <div
+  <draggable
+    class="list-group"
+    ghost-class="ghost"
+    :list="tasks"
+    :group="{ name: 'g1' }"
+    tag="ul"
+    v-bind="dragOptions"
+  >
+    <li
       :class="[element.deleted?'strike':'','list-group-item']"
       v-for="element in tasks"
       :key="element.id"
@@ -8,7 +15,10 @@
       {{ element.title }} -
       <small>{{element.body}}</small>
       <span class="actions">
-        <span style="display:inline-block;font-size:" v-if="!element.deleted">{{element.created_at}}</span>
+        <span
+          style="display:inline-block;font-size:0.75rem;letter-spacing: -0.25px;"
+          v-if="!element.deleted"
+        >{{element.created_at}}</span>
         <span
           style="display:inline-block;"
           class="custom-control custom-checkbox"
@@ -23,8 +33,8 @@
           <label class="custom-control-label" :for="'complete_'+element.id">&#10004;</label>
         </span>
       </span>
-      <nested-draggable :tasks="element.tasks" />
-    </div>
+      <nested-draggable :tasks="element.tasks" v-if="element.tasks.length>0" />
+    </li>
   </draggable>
 </template>
 <script>
@@ -36,10 +46,52 @@ export default {
       type: Array
     }
   },
+  data() {
+    return {
+      editable: true,
+      isDragging: false,
+      delayedDragging: false
+    };
+  },
+  watch: {
+    isDragging(newValue) {
+      if (newValue) {
+        this.delayedDragging = true;
+        return;
+      }
+      this.$nextTick(() => {
+        this.delayedDragging = false;
+      });
+    }
+  },
+  methods: {
+    orderList() {
+      this.list = this.list.sort((one, two) => {
+        return one.order - two.order;
+      });
+    },
+    onMove({ relatedContext, draggedContext }) {
+      const relatedElement = relatedContext.element;
+      const draggedElement = draggedContext.element;
+      return (
+        (!relatedElement || !relatedElement.fixed) && !draggedElement.fixed
+      );
+    }
+  },
   components: {
     draggable
   },
-  name: "nested-draggable"
+  name: "nested-draggable",
+  computed: {
+    dragOptions() {
+      return {
+        animation: 0,
+        group: "description",
+        disabled: !this.editable,
+        ghostClass: "ghost"
+      };
+    }
+  }
 };
 </script>
 <style scoped>
