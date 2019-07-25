@@ -3,38 +3,52 @@
     class="list-group"
     ghost-class="ghost"
     :list="tasks"
-    :group="{ name: 'g1' }"
-    tag="ul"
+    :group="{ name: 'description' }"
+    tag="div"
     v-bind="dragOptions"
+    @start="isDragging = true"
+    @end="isDragging = false"
   >
-    <li
-      :class="[element.deleted?'strike':'','list-group-item']"
-      v-for="element in tasks"
-      :key="element.id"
-    >
-      {{ element.title }} -
-      <small>{{element.body}}</small>
-      <span class="actions">
-        <span
-          style="display:inline-block;font-size:0.75rem;letter-spacing: -0.25px;"
-          v-if="!element.deleted"
-        >{{element.created_at}}</span>
-        <span
-          style="display:inline-block;"
-          class="custom-control custom-checkbox"
-          title="mark as complete"
-        >
-          <input
-            class="custom-control-input"
-            type="checkbox"
-            :value="element.id"
-            :id="'complete_'+element.id"
-          />
-          <label class="custom-control-label" :for="'complete_'+element.id">&#10004;</label>
+    <transition-group type="transition" :name="!isDragging ? 'flip-list' : null">
+      <div
+        :class="[element.deleted?'strike':'','list-group-item']"
+        v-for="element in tasks"
+        :key="element.id"
+      >
+        <div>
+          {{ element.title }} -
+          <small>{{element.body}}</small>
+          <span class="actions">
+            <span
+              style="display:inline-block;font-size:0.75rem;letter-spacing: -0.25px;"
+              v-if="!element.deleted"
+            >{{element.created_at}}</span>
+            <span
+              style="display:inline-block;"
+              class="custom-control custom-checkbox"
+              title="mark as complete"
+            >
+              <input
+                class="custom-control-input"
+                type="checkbox"
+                :value="element.id"
+                :id="'complete_'+element.id"
+              />
+              <label class="custom-control-label" :for="'complete_'+element.id">&#10004;</label>
+            </span>
+          </span>
+        </div>
+        <span v-if="element.tasks.length > 0">
+          <nested-draggable :tasks="element.tasks" />
         </span>
-      </span>
-      <nested-draggable :tasks="element.tasks" v-if="element.tasks.length>0" />
-    </li>
+        <span v-else>
+          <nested-draggable :tasks="element.tasks" />
+          <span
+            style="text-align:center;background:lightgrey;display:block;min-height:20px"
+          >Drag other to make its child</span>
+        </span>
+      </div>
+    </transition-group>
   </draggable>
 </template>
 <script>
@@ -85,7 +99,7 @@ export default {
   computed: {
     dragOptions() {
       return {
-        animation: 0,
+        animation: 200,
         group: "description",
         disabled: !this.editable,
         ghostClass: "ghost"
@@ -103,7 +117,7 @@ span.actions {
 }
 /* draggable css*/
 .flip-list-move {
-  transition: transform 0.5s;
+  transition: linear transform 0.5s;
 }
 .no-move {
   transition: transform 0s;
@@ -113,10 +127,23 @@ span.actions {
   background: #c8ebfb;
 }
 .list-group {
+  min-height: 10px;
+}
+.list-group-new {
   min-height: 20px;
 }
-.list-group-item {
+span > div.list-group > span > div.list-group-item {
   cursor: move;
+  position: relative;
+  display: block;
+  padding: 0.55rem 0 0.55rem 1rem;
+  margin-bottom: -1px;
+  background-color: #fff;
+  border-left: 1px solid rgba(0, 0, 0, 0.125);
+  border-top: 1px solid rgba(0, 0, 0, 0.125);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  border-right: 0px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0px;
 }
 .list-group-item i {
   cursor: pointer;

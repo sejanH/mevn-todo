@@ -74,15 +74,15 @@ export default {
     };
   },
   watch: {
-    // isDragging(newValue) {
-    //   if (newValue) {
-    //     this.delayedDragging = true;
-    //     return;
-    //   }
-    //   this.$nextTick(() => {
-    //     this.delayedDragging = false;
-    //   });
-    // }
+    isDragging(newValue) {
+      if (newValue) {
+        this.delayedDragging = true;
+        return;
+      }
+      this.$nextTick(() => {
+        this.delayedDragging = false;
+      });
+    }
   },
   components: {
     nestedDraggable
@@ -126,30 +126,30 @@ export default {
       todo[0] = this.todos.filter(data => data.id == todoId)[0];
       todo[1] = todo[0].tasks;
       this.selectedTodo = todo;
+    },
+    orderList() {
+      this.list = this.list.sort((one, two) => {
+        return one.order - two.order;
+      });
+    },
+    onMove({ relatedContext, draggedContext }) {
+      const relatedElement = relatedContext.element;
+      const draggedElement = draggedContext.element;
+      return (
+        (!relatedElement || !relatedElement.fixed) && !draggedElement.fixed
+      );
     }
-    // orderList() {
-    //   this.list = this.list.sort((one, two) => {
-    //     return one.order - two.order;
-    //   });
-    // },
-    // onMove({ relatedContext, draggedContext }) {
-    //   const relatedElement = relatedContext.element;
-    //   const draggedElement = draggedContext.element;
-    //   return (
-    //     (!relatedElement || !relatedElement.fixed) && !draggedElement.fixed
-    //   );
-    // }
   },
   mounted() {},
   computed: {
-    // dragOptions() {
-    //   return {
-    //     animation: 0,
-    //     group: "description",
-    //     disabled: !this.editable,
-    //     ghostClass: "ghost"
-    //   };
-    // }
+    dragOptions() {
+      return {
+        animation: 200,
+        group: "description",
+        disabled: !this.editable,
+        ghostClass: "ghost"
+      };
+    }
   }
 };
 </script>
