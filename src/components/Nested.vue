@@ -33,6 +33,7 @@
                 type="checkbox"
                 :value="element.id"
                 :id="'complete_'+element.id"
+                @click="checkBoxAction"
               />
               <label class="custom-control-label" :for="'complete_'+element.id">&#10004;</label>
             </span>
@@ -43,9 +44,7 @@
         </span>
         <span v-else>
           <nested-draggable :tasks="element.tasks" />
-          <span
-            style="text-align:center;background:lightgrey;display:block;min-height:20px"
-          >Drag other to make its child</span>
+          <span class="dragOld">Drag other to make its child</span>
         </span>
       </div>
     </transition-group>
@@ -90,6 +89,19 @@ export default {
       return (
         (!relatedElement || !relatedElement.fixed) && !draggedElement.fixed
       );
+    },
+    checkBoxAction(e) {
+      if (e.target.checked) {
+        const id = e.target.value;
+        const token = localStorage.getItem("token").toString();
+        let formData = new FormData();
+        formData.append("id", id);
+        formData.append("token", token);
+        axios.post(
+          "http://localhost:8081/api/todo-list/change-todo-status",
+          formData
+        );
+      }
     }
   },
   components: {
@@ -151,5 +163,11 @@ span > div.list-group > span > div.list-group-item {
 .dragArea {
   min-height: 50px;
   outline: 1px dashed;
+}
+.dragOld {
+  text-align: center;
+  border: 1px dashed grey;
+  display: block;
+  min-height: 20px;
 }
 </style>

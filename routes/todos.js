@@ -23,6 +23,28 @@ router.get('/my-todos', (req, res) => {
     });
 });
 
+router.post('/todo-list/change-todo-status', (req, res) => {
+    //res.send(req);
+    console.log(req.body);
+    /*
+    jwt.verify(req.query.token, 'secretkey', (err, data) => {
+        if (err) {
+            res.status(401).send('expired');
+            throw err;
+        } else {
+            Todo.findTodoById(data.id, (err, todo) => {
+                if (err) throw err;
+                if (todo.todos.length > 0) {
+                    dateBeautify(todo.todos);
+                }
+
+                res.send(todo.todos);
+            });
+        }
+    });
+     */
+});
+
 function dateBeautify(data) {
 
     data.forEach((currentValue, index, arr) => {
