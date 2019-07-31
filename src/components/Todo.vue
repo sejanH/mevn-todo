@@ -2,7 +2,21 @@
   <div>
     <div id="todo" class="row justify-content-center">
       <div class="col-md-3" id="todo-list">
-        <h6>Select one</h6>
+        <div style="display:block;">
+          <h6 style="display: inline-block;">Select one</h6>
+          <button
+            v-if="$route.name=='todo'"
+            @click="$router.push({name:'new-todo'})"
+            class="btn bg-mevn btn-xs"
+            title="Add new"
+          >&#x2725;</button>
+          <button
+            v-if="$route.name == 'new-todo'"
+            @click="$router.push({name:'todo'})"
+            class="btn bg-mevn btn-xs"
+            title="Back"
+          >&#x276E;&#x276E;</button>
+        </div>
         <div class="scrollbar">
           <div class="handle">
             <div class="mousearea"></div>
@@ -11,8 +25,8 @@
 
         <div class="frame smart" id="smart">
           <ul class="items">
-            <li v-for="todo in parentTodo" v-bind:key="todo.id" @click="showTodo(todo.id)">
-              {{todo.id}} -
+            <li v-for="(todo,index) in parentTodo" v-bind:key="todo.id" @click="showTodo(todo.id)">
+              {{index+1}} -
               <small>{{todo.title }}</small>
             </li>
           </ul>
@@ -20,21 +34,21 @@
       </div>
       <br />
       <div class="col-md-8 col-xs-11 col-sm-11" v-if="$route.name=='todo'">
-        <table class="table table-borderless table-sm">
-          <tr>
-            <td>
-              <h5
-                v-if="selectedTodo.length !== 0"
-                :class="[selectedTodo[0].deleted ? 'strike':'','']"
-              >
-                {{selectedTodo[0].title}}-
-                <small>{{selectedTodo[0].body}}</small>
-              </h5>
+        <table class="table table-borderless table-sm" v-if="selectedTodo.length !== 0">
+          <tr id="todo">
+            <td
+              :class="[selectedTodo[0].deleted ? 'strike':'','']"
+              style="font-size: 1.15rem;font-weight: 600"
+            >
+              {{selectedTodo[0].title}}-
+              <small>{{selectedTodo[0].body}}</small>
             </td>
             <td
-              v-if="selectedTodo.length !== 0"
               style="float:right;font-size:0.75rem;display : flex;align-items : center;"
             >{{selectedTodo[0].created_at}}</td>
+            <td>
+              <button class="btn btn-xs bg-mevn" title="Add new task" @click="addTask">&#x2724;</button>
+            </td>
           </tr>
         </table>
         <div v-if="parentTodo.length > 0 && parentTodo != -1">
@@ -60,6 +74,7 @@
 </template>
 <script>
 import nestedDraggable from "./Nested";
+import swal from "sweetalert";
 export default {
   name: "todo",
   data() {
@@ -114,8 +129,19 @@ export default {
         .catch(err => {
           if (err.request.response == "expired") {
             this.$root.$emit("expired");
+          } else if (err.request.status === 0) {
+            this.getTodo();
+            swal({
+              icon: "error",
+              title: "Sorry !",
+              text:
+                "Connection to server failed! Reload the page or try again later"
+            });
           }
         });
+    },
+    addTask() {
+      const todo = this.selectedTodo[0]._id;
     },
     showTodo(todoId) {
       this.selectedTodo = [];
@@ -159,7 +185,8 @@ export default {
   min-height: calc(100vh - 41px);
   max-height: 100vh;
 }
-h5 {
+h5,
+tr#todo {
   text-align: center;
   color: grey;
   border-bottom: 1px solid grey;
@@ -263,5 +290,11 @@ div.centered {
   right: 0;
   top: 0;
   bottom: 0;
+}
+button.btn-xs {
+  padding: 0 0.25rem;
+  font-size: 1rem;
+  font-weight: 800;
+  float: right;
 }
 </style>

@@ -28,18 +28,7 @@
             >{{nav.title}}</router-link>
             <span v-else-if="nav.show == true && nav.name=='todo'" class="input-group">
               <router-link class="nav-link input-group-prepend" :to="{name:nav.name}">{{nav.title}}</router-link>
-              <button
-                type="button"
-                class="btn dropdown-toggle dropdown-toggle-split"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                <span class="sr-only">Toggle Dropdown</span>
-              </button>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <router-link :to="{name:'new-todo'}" class="dropdown-item">Add new</router-link>
-              </div>
+              
             </span>
           </li>
           <li class="nav-item" v-if="isLogged">

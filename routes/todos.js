@@ -12,41 +12,58 @@ router.get('/my-todos', (req, res) => {
             throw err;
         } else {
             Todo.findTodoById(data.id, (err, todo) => {
+                console.log(todo);
                 if (err) throw err;
-                if (todo.todos.length > 0) {
-                    dateBeautify(todo.todos);
+                if (todo.length > 0) {
+                    dateBeautify(todo);
                 }
+                res.send(todo);
+                //res.send(todo.todos);
+            });
+        }
+    });
+});
 
-                res.send(todo.todos);
+/* create new todo */
+router.post('/new/create', (req, res) => {
+    jwt.verify(req.body.token, 'secretkey', (err, data) => {
+        if (err) {
+            res.status(401).send('expired');
+            throw err;
+        } else {
+            const newTodo = new Todo.TodoSchema({
+                user: data.id,
+                title: req.body.title,
+                body: req.body.body,
+                tasks: req.body.tasks,
+                created_at: req.body.created_at,
+                parent: req.body.parent,
+                position: req.body.position,
+                active: req.body.active,
+                deleted: req.body.deleted,
+            });
+            Todo.createTodo(newTodo, req.body.token, (err, todo) => {
+                if (err) {
+                    return res.status(422).send(err)
+                }
+                res.send(todo);
             });
         }
     });
 });
 
 router.post('/todo-list/change-todo-status', (req, res) => {
-    //res.send(req);
-    console.log(req.body);
-    /*
-    jwt.verify(req.query.token, 'secretkey', (err, data) => {
+    jwt.verify(req.body.token, 'secretkey', (err, data) => {
         if (err) {
             res.status(401).send('expired');
             throw err;
         } else {
-            Todo.findTodoById(data.id, (err, todo) => {
-                if (err) throw err;
-                if (todo.todos.length > 0) {
-                    dateBeautify(todo.todos);
-                }
-
-                res.send(todo.todos);
-            });
+            Todo.changeTodoStatus(data.id, req.body.id);
         }
     });
-     */
 });
 
 function dateBeautify(data) {
-
     data.forEach((currentValue, index, arr) => {
         let m = new Date(parseInt(currentValue.created_at));
         currentValue.created_at = m.getFullYear() + '-' + m.getMonth() + '-' + m.getDate() + ' ' + m.getHours() + ':' + m.getMinutes() + ':' + m.getSeconds();

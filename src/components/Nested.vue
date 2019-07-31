@@ -92,15 +92,21 @@ export default {
     },
     checkBoxAction(e) {
       if (e.target.checked) {
-        const id = e.target.value;
+        const id = e.target.value.toString();
         const token = localStorage.getItem("token").toString();
-        let formData = new FormData();
+        var formData = new FormData();
         formData.append("id", id);
         formData.append("token", token);
-        axios.post(
-          "http://localhost:8081/api/todo-list/change-todo-status",
-          formData
-        );
+        axios.post("http://localhost:8081/api/todo-list/change-todo-status",
+        {
+          "id":id,
+          "token":token
+        })
+        .then(res=>{
+          console.log(res)
+        }).catch(err=>{
+
+        });
       }
     }
   },
@@ -166,6 +172,7 @@ span > div.list-group > span > div.list-group-item {
 }
 .dragOld {
   text-align: center;
+  background: rgba(0,0,0,0.05);
   border: 1px dashed grey;
   display: block;
   min-height: 20px;

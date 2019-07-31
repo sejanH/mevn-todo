@@ -22,31 +22,6 @@ let options = {
 }
 app.use(cors(options))
 
-
-app.get('/posts', (req, res) => {
-    res.send(
-        [
-            {
-                id: 1,
-                title: "Hello World!",
-                description: "Hi there! How are you?"
-            },
-            {
-                id: 2,
-                title: "Hello World!",
-                description: "Hi there! How are you?"
-            },
-            {
-                id: 3,
-                title: "Hello World!",
-                description: "Hi there! How are you?"
-            }
-        ]
-    )
-});
-// app.get('/',(req,res)=>{
-
-// });
 const todos = require('./routes/todos');
 const users = require('./routes/users');
 app.use('/user', users);
