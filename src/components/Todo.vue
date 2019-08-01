@@ -23,9 +23,13 @@
           </div>
         </div>
 
-        <div class="frame smart" id="smart">
+        <div class="frame smart" id="smart" v-if="parentTodo != -1">
           <ul class="items">
-            <li v-for="(todo,index) in parentTodo" v-bind:key="todo.id" @click="showTodo(todo.id)">
+            <li
+              v-for="(todo,index) in parentTodo"
+              v-bind:key="todo._id"
+              @click="showTodo(todo._id)"
+            >
               {{index+1}} -
               <small>{{todo.title }}</small>
             </li>
@@ -54,17 +58,15 @@
         <div v-if="parentTodo.length > 0 && parentTodo != -1">
           <nested-draggable :tasks="selectedTodo[1]" />
         </div>
-        <div class="text-center centered" v-else>
+        <div class="text-center centered" v-if="parentTodo != -1 && parentTodo.length == 0">
           <div class="spinner-grow text-danger" role="status">
             <span class="sr-only">Loading...</span>
           </div>
         </div>
-
-        <div
-          class="alert alert-warning"
-          role="alert"
-          v-if="parentTodo == -1"
-        >Hi No Todo Found by your name</div>
+        <div class="alert alert-warning" role="alert" v-if="parentTodo == -1">
+          Hi No Todo Found by your name
+          <router-link :to="{name:'new-todo'}">create one now</router-link>
+        </div>
       </div>
       <div class="col-md-8 col-xs-11 col-sm-11" v-else>
         <router-view></router-view>
@@ -97,6 +99,9 @@ export default {
       this.$nextTick(() => {
         this.delayedDragging = false;
       });
+    },
+    parentTodo(val) {
+      this.parentTodo = val;
     }
   },
   components: {
@@ -123,7 +128,7 @@ export default {
             plugin.setAttribute("src", "/js/sly.min.js");
             plugin.async = true;
             document.head.appendChild(plugin);
-            this.showTodo(this.todos[0].id);
+            this.showTodo(this.todos[0]._id);
           }
         })
         .catch(err => {
@@ -141,7 +146,10 @@ export default {
         });
     },
     addTask() {
-      const todo = this.selectedTodo[0]._id;
+      this.$router.push({
+        name: "new-todo",
+        query: { todo: this.selectedTodo[0]._id }
+      });
     },
     showTodo(todoId) {
       this.selectedTodo = [];
@@ -149,7 +157,7 @@ export default {
         return { body, order: index + 1, fixed: false };
       });
       let todo = [];
-      todo[0] = this.todos.filter(data => data.id == todoId)[0];
+      todo[0] = this.todos.filter(data => data._id == todoId)[0];
       todo[1] = todo[0].tasks;
       this.selectedTodo = todo;
     },

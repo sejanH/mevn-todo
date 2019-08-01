@@ -13,7 +13,7 @@
       <div
         :class="[element.deleted?'strike':'','list-group-item']"
         v-for="element in tasks"
-        :key="element.id"
+        :key="element._id"
       >
         <div>
           {{ element.title }} -
@@ -31,11 +31,11 @@
               <input
                 class="custom-control-input"
                 type="checkbox"
-                :value="element.id"
-                :id="'complete_'+element.id"
+                :value="element._id"
+                :id="'complete_'+element._id"
                 @click="checkBoxAction"
               />
-              <label class="custom-control-label" :for="'complete_'+element.id">&#10004;</label>
+              <label class="custom-control-label" :for="'complete_'+element._id">&#10004;</label>
             </span>
           </span>
         </div>
@@ -97,16 +97,15 @@ export default {
         var formData = new FormData();
         formData.append("id", id);
         formData.append("token", token);
-        axios.post("http://localhost:8081/api/todo-list/change-todo-status",
-        {
-          "id":id,
-          "token":token
-        })
-        .then(res=>{
-          console.log(res)
-        }).catch(err=>{
-
-        });
+        axios
+          .post("http://localhost:8081/api/todo-list/change-todo-status", {
+            id: id,
+            token: token
+          })
+          .then(res => {
+            console.log(res);
+          })
+          .catch(err => {});
       }
     }
   },
@@ -172,7 +171,7 @@ span > div.list-group > span > div.list-group-item {
 }
 .dragOld {
   text-align: center;
-  background: rgba(0,0,0,0.05);
+  background: rgba(0, 0, 0, 0.05);
   border: 1px dashed grey;
   display: block;
   min-height: 20px;

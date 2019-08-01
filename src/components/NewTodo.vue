@@ -1,7 +1,8 @@
 <template>
   <div class="row justify-content-center">
     <div class="col-md-9">
-      <h4>Add a new todo</h4>
+      <h4 v-if="typeof $route.query.todo=='undefined'">Add a new todo</h4>
+      <h4 v-if="typeof $route.query.todo!='undefined'">Add a new task</h4>
       <form v-bind:model="newTodo" v-on:submit.prevent="addNewTodo">
         <div class="form-group">
           <label for="title">Title</label>
@@ -14,7 +15,8 @@
         <input
           type="submit"
           value="Add"
-          :class="[newTodo.title || newTodo.body==''?'btn-disabled':'','btn btn-success']"
+          class="btn bg-mevn"
+          :disabled="newTodo.title =='' || newTodo.body =='' ? true:false "
         />
       </form>
     </div>
@@ -38,17 +40,39 @@ export default {
       }
     };
   },
+  watch: {
+    "newTodo.title"(val) {
+      this.newTodo.title = val;
+    },
+    "newTodo.body"(val) {
+      this.newTodo.body = val;
+    }
+  },
   methods: {
     addNewTodo() {
-      axios
-        .post("http://localhost:8081/api/new/create", this.newTodo)
-        .then(res => {
-          console.log(res.data);
-          this.newTodo.title = this.newTodo.body = "";
-        })
-        .catch(err => {});
+      if (typeof this.$route.query.todo == "undefined") {
+        axios
+          .post("http://localhost:8081/api/new/create", this.newTodo)
+          .then(res => {
+            this.newTodo.title = this.newTodo.body = "";
+            this.$router.go("/todo-list");
+          })
+          .catch(err => {});
+      } else {
+        axios
+          .post("http://localhost:8081/api/new/task", {
+            task: this.newTodo,
+            id: this.$route.query.todo
+          })
+          .then(res => {
+            this.newTodo.title = this.newTodo.body = "";
+            // this.$router.go("/todo-list");
+          })
+          .catch(err => {});
+      }
     }
-  }
+  },
+  mounted() {}
 };
 </script>
 

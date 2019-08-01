@@ -11,14 +11,12 @@ router.get('/my-todos', (req, res) => {
             res.status(401).send('expired');
             throw err;
         } else {
-            Todo.findTodoById(data.id, (err, todo) => {
-                console.log(todo);
+            Todo.findTodoByUserId(data.id, (err, todo) => {
                 if (err) throw err;
                 if (todo.length > 0) {
                     dateBeautify(todo);
                 }
                 res.send(todo);
-                //res.send(todo.todos);
             });
         }
     });
@@ -42,11 +40,30 @@ router.post('/new/create', (req, res) => {
                 active: req.body.active,
                 deleted: req.body.deleted,
             });
-            Todo.createTodo(newTodo, req.body.token, (err, todo) => {
+            Todo.createTodo(newTodo, (err, todo) => {
                 if (err) {
                     return res.status(422).send(err)
                 }
                 res.send(todo);
+            });
+        }
+    });
+});
+/* create a task under a todo */
+router.post('/new/task', (req, res) => {
+    jwt.verify(req.body.task.token, 'secretkey', (err, data) => {
+        if (err) {
+            res.status(401).send('expired');
+            throw err;
+        } else {
+            delete req.body.task.token;
+            req.body.task._id = '';
+            console.log(req.body.task);
+            Todo.createTaskById(req.body, (err, task) => {
+                if (err) {
+                    return res.status(422).send(err)
+                }
+                res.send(task);
             });
         }
     });

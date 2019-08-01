@@ -47,11 +47,16 @@ module.exports.createTodo = (newTodo, callback) => {
     newTodo.save(callback);
 };
 
-module.exports.findTodoById = function (userId, callback) {
+module.exports.findTodoByUserId = function (userId, callback) {
     //UserSchema.findById(mongoose.Types.ObjectId(userId), callback);
     Todo.find({ user: userId }, callback);
 
 }
+
+module.exports.createTaskById = (newTask, callback) => {
+    newTask.task._id = mongoose.Types.ObjectId();
+    Todo.updateOne({ "_id": mongoose.Types.ObjectId(newTask.id) }, { "tasks": newTask.task }, callback);
+};
 
 module.exports.changeTodoStatus = (userId, todoId, callback) => {
     console.log({ userId, todoId });
