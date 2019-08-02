@@ -25,12 +25,10 @@
 
         <div class="frame smart" id="smart" v-if="parentTodo != -1">
           <ul class="items">
-            <li
-              v-for="(todo,index) in parentTodo"
-              v-bind:key="todo._id"
-              @click="showTodo(todo._id)"
-            >
-              {{index+1}} -
+            <li v-for="(todo) in parentTodo" v-bind:key="todo._id" @click="showTodo(todo._id)">
+              <span class="todoActions">
+                <button class="btn btn-xs bg-danger">X</button>
+              </span>
               <small>{{todo.title }}</small>
             </li>
           </ul>
@@ -302,7 +300,17 @@ div.centered {
 button.btn-xs {
   padding: 0 0.25rem;
   font-size: 1rem;
-  font-weight: 800;
+  font-weight: 600;
   float: right;
+}
+.todoActions {
+  float: right;
+}
+.items > li .todoActions {
+  opacity: 0;
+}
+.items > li:hover .todoActions {
+  opacity: 1;
+  cursor: pointer;
 }
 </style>

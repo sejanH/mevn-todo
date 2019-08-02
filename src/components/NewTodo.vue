@@ -54,7 +54,6 @@ export default {
         axios
           .post("http://localhost:8081/api/new/create", this.newTodo)
           .then(res => {
-            this.newTodo.title = this.newTodo.body = "";
             this.$router.go("/todo-list");
           })
           .catch(err => {});
@@ -65,8 +64,7 @@ export default {
             id: this.$route.query.todo
           })
           .then(res => {
-            this.newTodo.title = this.newTodo.body = "";
-            // this.$router.go("/todo-list");
+            this.$router.go("/todo-list");
           })
           .catch(err => {});
       }

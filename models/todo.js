@@ -55,7 +55,7 @@ module.exports.findTodoByUserId = function (userId, callback) {
 
 module.exports.createTaskById = (newTask, callback) => {
     newTask.task._id = mongoose.Types.ObjectId();
-    Todo.updateOne({ "_id": mongoose.Types.ObjectId(newTask.id) }, { "tasks": newTask.task }, callback);
+    Todo.updateOne({ "_id": mongoose.Types.ObjectId(newTask.id) }, { $push: { "tasks": newTask.task } }, { upsert: true }, callback);
 };
 
 module.exports.changeTodoStatus = (userId, todoId, callback) => {
