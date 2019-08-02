@@ -27,7 +27,7 @@
           <ul class="items">
             <li v-for="(todo) in parentTodo" v-bind:key="todo._id" @click="showTodo(todo._id)">
               <span class="todoActions">
-                <button class="btn btn-xs bg-danger">X</button>
+                <button class="btn btn-xs bg-danger" @click="deleteTodo">X</button>
               </span>
               <small>{{todo.title }}</small>
             </li>
