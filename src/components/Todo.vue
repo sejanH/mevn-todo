@@ -12,7 +12,7 @@
           >&#x2725;</button>
           <button
             v-if="$route.name == 'new-todo'"
-            @click="$router.push({name:'todo'})"
+            @click="$router.go(-1)"
             class="btn bg-mevn btn-xs"
             title="Back"
           >&#x276E;&#x276E;</button>
@@ -25,9 +25,14 @@
 
         <div class="frame smart" id="smart" v-if="parentTodo != -1">
           <ul class="items">
-            <li v-for="(todo) in parentTodo" v-bind:key="todo._id" @click="showTodo(todo._id)">
-              <span class="todoActions">
-                <button class="btn btn-xs bg-danger" @click="deleteTodo">X</button>
+            <li
+              v-for="(todo) in parentTodo"
+              v-bind:key="todo._id"
+              @click="showTodo(todo._id)"
+              :class="[$route.name=='todo'?'':'disabled']"
+            >
+              <span class="todoActions" v-if="selectedTodo[0]._id==todo._id">
+                <button class="btn btn-xs bg-danger" @click="deleteTodo(todo._id)">X</button>
               </span>
               <small>{{todo.title }}</small>
             </li>
@@ -158,6 +163,26 @@ export default {
       todo[0] = this.todos.filter(data => data._id == todoId)[0];
       todo[1] = todo[0].tasks;
       this.selectedTodo = todo;
+    },
+    deleteTodo(todoId) {
+      swal("Delete the Todo?", {
+        buttons: {
+          cancel: "No!",
+          Logout: {
+            text: "Yes! Delete",
+            value: "delete"
+          }
+        }
+      }).then(value => {
+        switch (value) {
+          case "delete":
+            console.log(todoId);
+            this.getTodo();
+            break;
+          default:
+            swal({ text: "Delete cancelled!", button: false, timer: 1000 });
+        }
+      });
     },
     orderList() {
       this.list = this.list.sort((one, two) => {
@@ -300,7 +325,7 @@ div.centered {
 button.btn-xs {
   padding: 0 0.25rem;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 400;
   float: right;
 }
 .todoActions {
@@ -312,5 +337,9 @@ button.btn-xs {
 .items > li:hover .todoActions {
   opacity: 1;
   cursor: pointer;
+}
+.frame ul.items li.disabled {
+  /*pointer-events: none;*/
+  cursor: not-allowed;
 }
 </style>

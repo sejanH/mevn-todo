@@ -69,13 +69,13 @@ router.post('/new/task', (req, res) => {
     });
 });
 
-router.post('/todo-list/change-todo-status', (req, res) => {
+router.post('/todo-list/change-task-status', (req, res) => {
     jwt.verify(req.body.token, 'secretkey', (err, data) => {
         if (err) {
             res.status(401).send('expired');
             throw err;
         } else {
-            Todo.changeTodoStatus(data.id, req.body.id);
+            Todo.changeTaskStatus(data.id, req.body.id);
         }
     });
 });

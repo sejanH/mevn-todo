@@ -98,7 +98,7 @@ export default {
         formData.append("id", id);
         formData.append("token", token);
         axios
-          .post("http://localhost:8081/api/todo-list/change-todo-status", {
+          .post("http://localhost:8081/api/todo-list/change-task-status", {
             id: id,
             token: token
           })

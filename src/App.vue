@@ -50,4 +50,9 @@ body {
   /* background: rgba(93, 219, 226,1);*/
   background: rgba(93, 213, 226, 1);
 }
+button.bg-mevn,
+input[type="submit"].bg-mevn{
+	background: #0ac18e;
+  color:white;
+}
 </style>
