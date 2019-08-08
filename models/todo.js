@@ -61,3 +61,7 @@ module.exports.createTaskById = (newTask, callback) => {
 module.exports.changeTaskStatus = (userId, taskId, callback) => {
     console.log({ userId, taskId });
 };
+
+module.exports.changeTodoStatus = (data, callback) => {
+    Todo.updateOne({ user: data.user, _id: mongoose.Types.ObjectId(data.todo) }, { $set: { active: false, deleted: true } }, callback);
+};

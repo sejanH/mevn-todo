@@ -105,6 +105,9 @@ export default {
     },
     parentTodo(val) {
       this.parentTodo = val;
+    },
+    selectedTodo(val) {
+      this.selectedTodo = val;
     }
   },
   components: {
@@ -177,7 +180,19 @@ export default {
         switch (value) {
           case "delete":
             console.log(todoId);
-            this.getTodo();
+            let frm = new FormData();
+            frm.append("token", localStorage.getItem("token"));
+            axios
+              .post("http://localhost:8081/api/todo/delete", {
+                token: localStorage.getItem("token"),
+                todoId
+              })
+              .then(res => {
+                console.log(res.data);
+                this.getTodo();
+              })
+              .catch(err => {});
+            //this.getTodo();
             break;
           default:
             swal({ text: "Delete cancelled!", button: false, timer: 1000 });

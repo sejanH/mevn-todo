@@ -80,6 +80,26 @@ router.post('/todo-list/change-task-status', (req, res) => {
     });
 });
 
+router.post('/todo/delete', (req, res) => {
+    jwt.verify(req.body.token, 'secretkey', (err, data) => {
+        if (err) {
+            res.status(401).send('expired');
+            throw err;
+        } else {
+            let todo = {
+                'user': data.id,
+                'todo': req.body.todoId
+            };
+            Todo.changeTodoStatus(todo, (err, result) => {
+                if (err) {
+                    return res.status(422).send(err);
+                }
+                res.send(result);
+            });
+        }
+    });
+});
+
 function dateBeautify(data) {
     data.forEach((currentValue, index, arr) => {
         let m = new Date(parseInt(currentValue.created_at));
