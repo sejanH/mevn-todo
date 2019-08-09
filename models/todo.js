@@ -58,8 +58,12 @@ module.exports.createTaskById = (newTask, callback) => {
     Todo.updateOne({ "_id": mongoose.Types.ObjectId(newTask.id) }, { $push: { "tasks": newTask.task } }, { upsert: true }, callback);
 };
 
-module.exports.changeTaskStatus = (userId, taskId, callback) => {
-    console.log({ userId, taskId });
+module.exports.changeTaskStatus = (todoId, userId, taskId, callback) => {
+    Todo.updateOne({
+        "_id": mongoose.Types.ObjectId(todoId),
+        "user": userId,
+        "tasks._id": mongoose.Types.ObjectId(taskId)
+    }, { $set: { "tasks.$.active": false } }, callback);
 };
 
 module.exports.changeTodoStatus = (data, callback) => {

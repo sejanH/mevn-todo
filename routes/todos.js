@@ -75,7 +75,13 @@ router.post('/todo-list/change-task-status', (req, res) => {
             res.status(401).send('expired');
             throw err;
         } else {
-            Todo.changeTaskStatus(data.id, req.body.id);
+            Todo.changeTaskStatus(req.body.todoId, data.id, req.body.id, (err, response) => {
+                if (err) {
+                    res.status(401).send('expired');
+                    throw err;
+                }
+                res.send(response);
+            });
         }
     });
 });

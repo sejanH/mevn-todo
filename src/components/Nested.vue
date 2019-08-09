@@ -2,7 +2,7 @@
   <draggable
     class="list-group"
     ghost-class="ghost"
-    :list="tasks"
+    :list="todoTasks.tasks"
     :group="{ name: 'description' }"
     tag="div"
     v-bind="dragOptions"
@@ -11,7 +11,7 @@
   >
     <transition-group type="transition" :name="!isDragging ? 'flip-list' : null">
       <div
-        :class="[element.deleted?'strike':'','list-group-item']"
+        :class="[!element.active?'strike':'','list-group-item']"
         v-for="element in tasks"
         :key="element._id"
       >
@@ -21,8 +21,7 @@
           <span class="actions">
             <span
               style="display:inline-block;font-size:0.75rem;letter-spacing: -0.25px;"
-              v-if="!element.deleted"
-            >{{element.created_at}}</span>
+            >{{element.created_at}}</span>&nbsp;
             <span
               style="display:inline-block;"
               class="custom-control custom-checkbox"
@@ -32,10 +31,16 @@
                 class="custom-control-input"
                 type="checkbox"
                 :value="element._id"
+                :checked="!element.active"
                 :id="'complete_'+element._id"
-                @click="checkBoxAction"
+                @change="checkBoxAction"
               />
-              <label class="custom-control-label" :for="'complete_'+element._id">&#10004;</label>
+              <label
+                v-if="!element.active"
+                class="custom-control-label"
+                :for="'complete_'+element._id"
+              >&#10004;</label>
+              <label v-else class="custom-control-label" :for="'complete_'+element._id">&#9022;</label>
             </span>
           </span>
         </div>
@@ -75,6 +80,10 @@ export default {
       this.$nextTick(() => {
         this.delayedDragging = false;
       });
+    },
+    todoTasks() {
+      alert(1);
+      deep: false;
     }
   },
   methods: {
@@ -91,21 +100,36 @@ export default {
       );
     },
     checkBoxAction(e) {
-      if (e.target.checked) {
-        const id = e.target.value.toString();
-        const token = localStorage.getItem("token").toString();
-        var formData = new FormData();
-        formData.append("id", id);
-        formData.append("token", token);
+      if (
+        e.target.checked &&
+        this.tasks.filter(data => data._id == e.target.value)[0].active == true
+      ) {
+        const id = e.target.value;
+        const token = localStorage.getItem("token");
+        this.tasks.filter(data => data._id == id)[0].active = false;
+
         axios
           .post("http://localhost:8081/api/todo-list/change-task-status", {
+            todoId: this.$parent.selectedTodo[0]._id,
             id: id,
             token: token
           })
           .then(res => {
-            console.log(res);
+            if (res.data.nModified == 1) {
+              this.todoTasks.tasks.filter(
+                data => data._id == id
+              )[0].active = false;
+            }
           })
           .catch(err => {});
+      } else {
+        swal({
+          icon: "info",
+          text: "Once marked completed it cannot be undone yet!",
+          timer: 2000,
+          button: false
+        });
+        e.target.checked = true;
       }
     }
   },
@@ -116,10 +140,15 @@ export default {
   computed: {
     dragOptions() {
       return {
-        animation: 200,
+        animation: 250,
         group: "description",
         disabled: !this.editable,
         ghostClass: "ghost"
+      };
+    },
+    todoTasks() {
+      return {
+        tasks: this.tasks
       };
     }
   }
