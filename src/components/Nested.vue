@@ -1,59 +1,61 @@
 <template>
-  <draggable
-    class="list-group"
-    ghost-class="ghost"
-    :list="todoTasks.tasks"
-    :group="{ name: 'description' }"
-    tag="div"
-    v-bind="dragOptions"
-    @start="isDragging = true"
-    @end="isDragging = false"
-  >
-    <transition-group type="transition" :name="!isDragging ? 'flip-list' : null">
-      <div
-        :class="[!element.active?'strike':'','list-group-item']"
-        v-for="element in tasks"
-        :key="element._id"
-      >
-        <div>
-          {{ element.title }} -
-          <small>{{element.body}}</small>
-          <span class="actions">
-            <span
-              style="display:inline-block;font-size:0.75rem;letter-spacing: -0.25px;"
-            >{{element.created_at}}</span>&nbsp;
-            <span
-              style="display:inline-block;"
-              class="custom-control custom-checkbox"
-              title="mark as complete"
-            >
-              <input
-                class="custom-control-input"
-                type="checkbox"
-                :value="element._id"
-                :checked="!element.active"
-                :id="'complete_'+element._id"
-                @change="checkBoxAction"
-              />
-              <label
-                v-if="!element.active"
-                class="custom-control-label"
-                :for="'complete_'+element._id"
-              >&#10004;</label>
-              <label v-else class="custom-control-label" :for="'complete_'+element._id">&#9022;</label>
+  <div>
+    <draggable
+      class="list-group"
+      ghost-class="ghost"
+      :list="todoTasks.tasks"
+      :group="{ name: 'description' }"
+      tag="div"
+      v-bind="dragOptions"
+      @start="isDragging = true"
+      @end="isDragging = false"
+    >
+      <transition-group type="transition" :name="!isDragging ? 'flip-list' : null">
+        <div
+          :class="[!element.active?'strike':'','list-group-item']"
+          v-for="element in tasks"
+          :key="element._id"
+        >
+          <div>
+            {{ element.title }} -
+            <small>{{element.body}}</small>
+            <span class="actions">
+              <span
+                style="display:inline-block;font-size:0.75rem;letter-spacing: -0.25px;"
+              >{{element.created_at}}</span>&nbsp;
+              <span
+                style="display:inline-block;"
+                class="custom-control custom-checkbox"
+                title="mark as complete"
+              >
+                <input
+                  class="custom-control-input"
+                  type="checkbox"
+                  :value="element._id"
+                  :checked="!element.active"
+                  :id="'complete_'+element._id"
+                  @change="checkBoxAction"
+                />
+                <label
+                  v-if="!element.active"
+                  class="custom-control-label"
+                  :for="'complete_'+element._id"
+                >&#10004;</label>
+                <label v-else class="custom-control-label" :for="'complete_'+element._id">&#9022;</label>
+              </span>
             </span>
+          </div>
+          <span v-if="element.tasks.length > 0">
+            <nested-draggable :tasks="element.tasks" />
+          </span>
+          <span v-else>
+            <nested-draggable :tasks="element.tasks" />
+            <span class="dragOld">Drag other to make its child</span>
           </span>
         </div>
-        <span v-if="element.tasks.length > 0">
-          <nested-draggable :tasks="element.tasks" />
-        </span>
-        <span v-else>
-          <nested-draggable :tasks="element.tasks" />
-          <span class="dragOld">Drag other to make its child</span>
-        </span>
-      </div>
-    </transition-group>
-  </draggable>
+      </transition-group>
+    </draggable>
+  </div>
 </template>
 <script>
 import draggable from "vuedraggable";
@@ -81,8 +83,8 @@ export default {
         this.delayedDragging = false;
       });
     },
-    todoTasks() {
-      alert(1);
+    todoTasks(val) {
+      this.$parent.$emit("changed", val);
       deep: false;
     }
   },

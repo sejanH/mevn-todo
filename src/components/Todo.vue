@@ -60,6 +60,11 @@
         </table>
         <div v-if="parentTodo.length > 0 && parentTodo != -1">
           <nested-draggable :tasks="selectedTodo[1]" />
+          <button
+            class="btn bg-mevn btn-block"
+            @click="SaveChanges"
+            :disabled="!SaveChangesEnabled"
+          >Save changes</button>
         </div>
         <div class="text-center centered" v-if="parentTodo != -1 && parentTodo.length == 0">
           <div class="spinner-grow text-danger" role="status">
@@ -90,7 +95,8 @@ export default {
       selectedTodo: [],
       editable: true,
       isDragging: false,
-      delayedDragging: false
+      delayedDragging: false,
+      SaveChangesEnabled: false
     };
   },
   watch: {
@@ -108,6 +114,9 @@ export default {
     },
     selectedTodo(val) {
       this.selectedTodo = val;
+    },
+    SaveChangesEnabled(val) {
+      this.SaveChangesEnabled = val;
     }
   },
   components: {
@@ -199,6 +208,21 @@ export default {
         }
       });
     },
+    SaveChanges() {
+      swal("Save the changes?", {
+        buttons: {
+          cancel: "No!",
+          Logout: {
+            text: "Save",
+            value: "save"
+          }
+        }
+      }).then(value => {
+        if (value == "save") {
+        } else {
+        }
+      });
+    },
     orderList() {
       this.list = this.list.sort((one, two) => {
         return one.order - two.order;
@@ -212,7 +236,13 @@ export default {
       );
     }
   },
-  mounted() {},
+  mounted() {
+    this.$on("changed", data => {
+      this.SaveChangesEnabled = true;
+      this.selectedTodo[1] = data.tasks;
+      this.selectedTodo[0].tasks = data.tasks;
+    });
+  },
   computed: {
     dragOptions() {
       return {
