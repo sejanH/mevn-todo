@@ -106,6 +106,27 @@ router.post('/todo/delete', (req, res) => {
     });
 });
 
+router.post('/todo-save-order', (req, res) => {
+    jwt.verify(req.body.token, 'secretkey', (err, data) => {
+        if (err) {
+            res.status(401).send('expired');
+            throw err;
+        } else {
+            const dt = {
+                user: data.id,
+                todo: req.body.todoId,
+                newOrder: req.body.newOrder
+            };
+            Todo.TodoSaveOrder(dt, (err, response) => {
+                if (err) {
+                    return res.status(422).send(err);
+                }
+                res.send(response);
+            });
+        }
+    });
+});
+
 function dateBeautify(data) {
     data.forEach((currentValue, index, arr) => {
         let m = new Date(parseInt(currentValue.created_at));

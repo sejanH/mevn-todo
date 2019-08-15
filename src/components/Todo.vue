@@ -61,8 +61,9 @@
         <div v-if="parentTodo.length > 0 && parentTodo != -1">
           <nested-draggable :tasks="selectedTodo[1]" />
           <button
+            v-if="selectedTodo[1].length > 0"
             class="btn bg-mevn btn-block"
-            @click="SaveChanges"
+            @click="SaveChanges(selectedTodo[0]._id)"
             :disabled="!SaveChangesEnabled"
           >Save changes</button>
         </div>
@@ -126,7 +127,7 @@ export default {
     this.getTodo();
   },
   methods: {
-    async getTodo() {
+    async getTodo(id = null) {
       await axios
         .get("http://localhost:8081/api/my-todos", {
           params: {
@@ -143,7 +144,11 @@ export default {
             plugin.setAttribute("src", "/js/sly.min.js");
             plugin.async = true;
             document.head.appendChild(plugin);
-            this.showTodo(this.todos[0]._id);
+            if (id == null) {
+              this.showTodo(this.todos[0]._id);
+            } else {
+              this.showTodo(id);
+            }
           }
         })
         .catch(err => {
@@ -188,27 +193,22 @@ export default {
       }).then(value => {
         switch (value) {
           case "delete":
-            console.log(todoId);
-            let frm = new FormData();
-            frm.append("token", localStorage.getItem("token"));
             axios
               .post("http://localhost:8081/api/todo/delete", {
                 token: localStorage.getItem("token"),
                 todoId
               })
               .then(res => {
-                console.log(res.data);
                 this.getTodo();
               })
               .catch(err => {});
-            //this.getTodo();
             break;
           default:
             swal({ text: "Delete cancelled!", button: false, timer: 1000 });
         }
       });
     },
-    SaveChanges() {
+    SaveChanges(todoId) {
       swal("Save the changes?", {
         buttons: {
           cancel: "No!",
@@ -219,6 +219,20 @@ export default {
         }
       }).then(value => {
         if (value == "save") {
+          axios
+            .post("http://localhost:8081/api/todo-save-order", {
+              token: localStorage.getItem("token"),
+              todoId,
+              newOrder: this.selectedTodo[1]
+            })
+            .then(res => {
+              if (res.data.nModified == 1) {
+                this.getTodo(todoId);
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            });
         } else {
         }
       });
