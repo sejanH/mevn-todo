@@ -52,7 +52,7 @@
             </td>
             <td
               style="float:right;font-size:0.75rem;display : flex;align-items : center;"
-            >{{selectedTodo[0].created_at}}</td>
+            >{{selectedTodo[0].created_att}}</td>
             <td>
               <button class="btn btn-xs bg-mevn" title="Add new task" @click="addTask">&#x2724;</button>
             </td>
@@ -127,6 +127,41 @@ export default {
     this.getTodo();
   },
   methods: {
+    dateBeautify(data) {
+      data.forEach((currentValue, index, arr) => {
+        let m = new Date(parseInt(currentValue.created_at));
+        currentValue.created_att =
+          m.getFullYear() +
+          "-" +
+          m.getMonth() +
+          "-" +
+          m.getDate() +
+          " " +
+          m.getHours() +
+          ":" +
+          m.getMinutes() +
+          ":" +
+          m.getSeconds();
+        currentValue.tasks.forEach(val => {
+          let d = new Date(parseInt(val.created_at));
+          val.created_att =
+            d.getFullYear() +
+            "-" +
+            d.getMonth() +
+            "-" +
+            d.getDate() +
+            "  " +
+            d.getHours() +
+            ":" +
+            d.getMinutes() +
+            ":" +
+            d.getSeconds();
+          if (val.tasks.length > 0) {
+            dateBeautify(val.tasks);
+          }
+        });
+      });
+    },
     async getTodo(id = null) {
       await axios
         .get("http://localhost:8081/api/my-todos", {
@@ -144,6 +179,7 @@ export default {
             plugin.setAttribute("src", "/js/sly.min.js");
             plugin.async = true;
             document.head.appendChild(plugin);
+            this.dateBeautify(this.todos);
             if (id == null) {
               this.showTodo(this.todos[0]._id);
             } else {
@@ -219,22 +255,34 @@ export default {
         }
       }).then(value => {
         if (value == "save") {
-          axios
-            .post("http://localhost:8081/api/todo-save-order", {
-              token: localStorage.getItem("token"),
-              todoId,
-              newOrder: this.selectedTodo[1]
-            })
-            .then(res => {
-              if (res.data.nModified == 1) {
-                this.getTodo(todoId);
-              }
-            })
-            .catch(err => {
-              console.log(err);
-            });
+          this.dataParse(this.selectedTodo[1]);
+          // axios
+          //   .post("http://localhost:8081/api/todo-save-order", {
+          //     token: localStorage.getItem("token"),
+          //     todoId,
+          //     newOrder: this.selectedTodo[1]
+          //   })
+          //   .then(res => {
+          //     if (res.data.nModified == 1) {
+          //       this.getTodo(todoId);
+          //     }
+          //   })
+          //   .catch(err => {
+          //     console.log(err);
+          //   });
         } else {
         }
+      });
+    },
+    dataParse(data) {
+      data.forEach((currentValue, index, arr) => {
+        delete currentValue.created_att;
+        console.log(currentValue);
+        currentValue.tasks.forEach(val => {
+          if (val.tasks.length > 0) {
+            dateParse(val.tasks);
+          }
+        });
       });
     },
     orderList() {

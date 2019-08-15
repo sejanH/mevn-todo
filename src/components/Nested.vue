@@ -22,7 +22,7 @@
             <span class="actions">
               <span
                 style="display:inline-block;font-size:0.75rem;letter-spacing: -0.25px;"
-              >{{element.created_at}}</span>&nbsp;
+              >{{element.created_att}}</span>&nbsp;
               <span
                 style="display:inline-block;"
                 class="custom-control custom-checkbox"
@@ -108,8 +108,6 @@ export default {
       ) {
         const id = e.target.value;
         const token = localStorage.getItem("token");
-        this.tasks.filter(data => data._id == id)[0].active = false;
-
         axios
           .post("http://localhost:8081/api/todo-list/change-task-status", {
             todoId: this.$parent.selectedTodo[0]._id,
@@ -121,6 +119,12 @@ export default {
               this.todoTasks.tasks.filter(
                 data => data._id == id
               )[0].active = false;
+            } else {
+              e.target.checked = false;
+              swal({
+                icon: "warning",
+                text: "Something went wrong! Try again later"
+              });
             }
           })
           .catch(err => {});

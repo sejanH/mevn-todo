@@ -14,7 +14,7 @@ router.get('/my-todos', (req, res) => {
             Todo.findTodoByUserId(data.id, (err, todo) => {
                 if (err) throw err;
                 if (todo.length > 0) {
-                    dateBeautify(todo);
+                    // dateBeautify(todo);
                 }
                 res.send(todo);
             });
@@ -112,6 +112,7 @@ router.post('/todo-save-order', (req, res) => {
             res.status(401).send('expired');
             throw err;
         } else {
+            //  dateParse(req.body.newOrder);
             const dt = {
                 user: data.id,
                 todo: req.body.todoId,
@@ -143,5 +144,20 @@ function dateBeautify(data) {
 
 }
 
+function dateParse(data) {
+    data.forEach((currentValue, index, arr) => {
+        console.log(currentValue.created_at);
+        let m = "'" + new Date(currentValue.created_at) + "'";
+        currentValue.created_at = Date.parse(m);
+        currentValue.tasks.forEach((val) => {
+            let d = "'" + new Date(val.created_at) + "'";
+            val.created_at = Date.parse(d);
+            if (val.tasks.length > 0) {
+                dateParse(val.tasks);
+            }
+        });
 
-module.exports = router;
+    });
+}
+
+module.exports = router; 

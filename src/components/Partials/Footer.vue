@@ -1,14 +1,13 @@
 <template>
-	<div id="footer">
-		&copy; Mominul H. Sejan
-	</div>
+  <div id="footer">&copy; Mominul Haque Sejan 2018-{{toYear}}</div>
 </template>
-<style>
-	#footer{
-		clear: both;
-		margin-top: -24px;
-		position: relative;
-		bottom: 0;
-		text-align: center;
-	}
-</style>
+<script>
+export default {
+  name: "Footer",
+  data() {
+    return {
+      toYear: new Date().getFullYear()
+    };
+  }
+};
+</script>

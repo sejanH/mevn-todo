@@ -28,7 +28,6 @@
             >{{nav.title}}</router-link>
             <span v-else-if="nav.show == true && nav.name=='todo'" class="input-group">
               <router-link class="nav-link input-group-prepend" :to="{name:nav.name}">{{nav.title}}</router-link>
-              
             </span>
           </li>
           <li class="nav-item" v-if="isLogged">
@@ -134,16 +133,3 @@ export default {
   }
 };
 </script>
-<style>
-.navbar {
-  padding: 0rem 1rem;
-  border-bottom: 1px solid lightgrey;
-}
-.navbar-dark .navbar-nav .nav-link {
-  color: rgba(255, 255, 255, 1);
-  font-weight: 500;
-}
-.nav-item > .router-link-exact-active {
-  background: rgba(72, 195, 202, 1);
-}
-</style>

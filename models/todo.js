@@ -49,7 +49,7 @@ module.exports.createTodo = (newTodo, callback) => {
 
 module.exports.findTodoByUserId = function (userId, callback) {
     //UserSchema.findById(mongoose.Types.ObjectId(userId), callback);
-    Todo.find({ user: userId, "$and": [{ deleted: false }, { active: true }] }, callback);
+    Todo.find({ user: userId, "$and": [{ deleted: false }, { active: true }] }, callback).sort('created_at');
 
 }
 
