@@ -1,6 +1,6 @@
 <template>
   <div id="signup" class="row justify-content-center">
-    <div class="col-md-5">
+    <div class="col-md-5 website">
       <h4>Help me learn better</h4>
       <p>
         Join this site and share your feedbacks with me.
@@ -197,5 +197,10 @@ form.signup-form {
   font-weight: 400;
   color: cyan;
   font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+}
+@media only screen and (max-width: 420px){
+div.website{
+visibility: hidden;display: none;
+}
 }
 </style>

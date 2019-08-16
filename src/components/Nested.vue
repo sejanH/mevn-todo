@@ -21,7 +21,7 @@
             <small>{{element.body}}</small>
             <span class="actions">
               <span
-                style="display:inline-block;font-size:0.75rem;letter-spacing: -0.25px;"
+                style="display:inline-block;font-size:0.7rem;letter-spacing: -0.30px;"
               >{{element.created_att}}</span>&nbsp;
               <span
                 style="display:inline-block;"
@@ -108,9 +108,10 @@ export default {
       ) {
         const id = e.target.value;
         const token = localStorage.getItem("token");
+        console.log(this.$root.$children[0].$children[1].selectedTodo[0]);
         axios
           .post("http://localhost:8081/api/todo-list/change-task-status", {
-            todoId: this.$parent.selectedTodo[0]._id,
+            todoId: this.$root.$children[0].$children[1].selectedTodo[0]._id,
             id: id,
             token: token
           })
@@ -161,7 +162,7 @@ export default {
 };
 </script>
 <style scoped>
-.strike {
+div.strike:first-line {
   text-decoration: line-through;
 }
 span.actions {

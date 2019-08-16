@@ -5,16 +5,16 @@
         <div style="display:block;">
           <h6 style="display: inline-block;">Select one</h6>
           <button
-            v-if="$route.name=='todo'"
-            @click="$router.push({name:'new-todo'})"
-            class="btn bg-mevn btn-xs"
-            title="Add new"
+          v-if="$route.name=='todo'"
+          @click="$router.push({name:'new-todo'})"
+          class="btn bg-mevn btn-xs"
+          title="Add new"
           >&#x2725;</button>
           <button
-            v-if="$route.name == 'new-todo'"
-            @click="$router.go(-1)"
-            class="btn bg-mevn btn-xs"
-            title="Back"
+          v-if="$route.name == 'new-todo'"
+          @click="$router.go(-1)"
+          class="btn bg-mevn btn-xs"
+          title="Back"
           >&#x276E;&#x276E;</button>
         </div>
         <div class="scrollbar">
@@ -26,144 +26,123 @@
         <div class="frame smart" id="smart" v-if="parentTodo != -1">
           <ul class="items">
             <li
-              v-for="(todo) in parentTodo"
-              v-bind:key="todo._id"
-              @click="showTodo(todo._id)"
-              :class="[$route.name=='todo'?'':'disabled']"
+            v-for="(todo) in parentTodo"
+            v-bind:key="todo._id"
+            @click="showTodo(todo._id)"
+            :class="[$route.name=='todo'?'':'disabled']"
             >
-              <span class="todoActions" v-if="selectedTodo[0]._id==todo._id">
-                <button class="btn btn-xs bg-danger" @click="deleteTodo(todo._id)">X</button>
-              </span>
-              <small>{{todo.title }}</small>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <br />
-      <div class="col-md-8 col-xs-11 col-sm-11" v-if="$route.name=='todo'">
-        <table class="table table-borderless table-sm" v-if="selectedTodo.length !== 0">
-          <tr id="todo">
-            <td
-              :class="[selectedTodo[0].deleted ? 'strike':'','']"
-              style="font-size: 1.15rem;font-weight: 600"
-            >
-              {{selectedTodo[0].title}}-
-              <small>{{selectedTodo[0].body}}</small>
-            </td>
-            <td
-              style="float:right;font-size:0.75rem;display : flex;align-items : center;"
-            >{{selectedTodo[0].created_att}}</td>
-            <td>
-              <button class="btn btn-xs bg-mevn" title="Add new task" @click="addTask">&#x2724;</button>
-            </td>
-          </tr>
-        </table>
-        <div v-if="parentTodo.length > 0 && parentTodo != -1">
-          <nested-draggable :tasks="selectedTodo[1]" />
-          <button
-            v-if="selectedTodo[1].length > 0"
-            class="btn bg-mevn btn-block"
-            @click="SaveChanges(selectedTodo[0]._id)"
-            :disabled="!SaveChangesEnabled"
-          >Save changes</button>
-        </div>
-        <div class="text-center centered" v-if="parentTodo != -1 && parentTodo.length == 0">
-          <div class="spinner-grow text-danger" role="status">
-            <span class="sr-only">Loading...</span>
-          </div>
-        </div>
-        <div class="alert alert-warning" role="alert" v-if="parentTodo == -1">
-          Hi No Todo Found by your name
-          <router-link :to="{name:'new-todo'}">create one now</router-link>
-        </div>
-      </div>
-      <div class="col-md-8 col-xs-11 col-sm-11" v-else>
-        <router-view></router-view>
+            <span class="todoActions" v-if="selectedTodo[0]._id==todo._id">
+              <button class="btn btn-xs bg-danger" @click="deleteTodo(todo._id)">X</button>
+            </span>
+            <small>{{todo.title }}</small>
+          </li>
+        </ul>
       </div>
     </div>
+    <br />
+    <div class="col-md-8 col-xs-11 col-sm-11" v-if="$route.name=='todo'">
+      <table class="table table-borderless table-sm" v-if="selectedTodo.length !== 0">
+        <tr id="todo">
+          <td
+          :class="[selectedTodo[0].deleted ? 'strike':'','']"
+          style="font-size: 1.15rem;font-weight: 600"
+          >
+          {{selectedTodo[0].title}}-
+          <small>{{selectedTodo[0].body}}</small>
+        </td>
+        <td
+        style="float:right;font-size:0.75rem;display : flex;align-items : center;"
+        >{{selectedTodo[0].created_att}}</td>
+        <td>
+          <button class="btn btn-xs bg-mevn" title="Add new task" @click="addTask">&#x2724;</button>
+        </td>
+      </tr>
+    </table>
+    <div v-if="parentTodo.length > 0 && parentTodo != -1">
+      <nested-draggable :tasks="selectedTodo[1]" />
+      <button
+      v-if="selectedTodo[1].length > 0"
+      class="btn bg-mevn btn-block"
+      @click="SaveChanges(selectedTodo[0]._id)"
+      :disabled="!SaveChangesEnabled"
+      >Save changes</button>
+    </div>
+    <div class="text-center centered" v-if="parentTodo != -1 && parentTodo.length == 0">
+      <div class="spinner-grow text-danger" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+    <div class="alert alert-warning" role="alert" v-if="parentTodo == -1">
+      Hi No Todo Found by your name
+      <router-link :to="{name:'new-todo'}">create one now</router-link>
+    </div>
   </div>
+  <div class="col-md-8 col-xs-11 col-sm-11" v-else>
+    <router-view></router-view>
+  </div>
+</div>
+</div>
 </template>
 <script>
-import nestedDraggable from "./Nested";
-import swal from "sweetalert";
-export default {
-  name: "todo",
-  data() {
-    return {
-      todos: [],
-      list: [],
-      parentTodo: [],
-      selectedTodo: [],
-      editable: true,
-      isDragging: false,
-      delayedDragging: false,
-      SaveChangesEnabled: false
-    };
-  },
-  watch: {
-    isDragging(newValue) {
-      if (newValue) {
-        this.delayedDragging = true;
-        return;
-      }
-      this.$nextTick(() => {
-        this.delayedDragging = false;
-      });
+  import nestedDraggable from "./Nested";
+  import swal from "sweetalert";
+  export default {
+    name: "todo",
+    data() {
+      return {
+        todos: [],
+        list: [],
+        parentTodo: [],
+        selectedTodo: [],
+        editable: true,
+        isDragging: false,
+        delayedDragging: false,
+        SaveChangesEnabled: false
+      };
     },
-    parentTodo(val) {
-      this.parentTodo = val;
-    },
-    selectedTodo(val) {
-      this.selectedTodo = val;
-    },
-    SaveChangesEnabled(val) {
-      this.SaveChangesEnabled = val;
-    }
-  },
-  components: {
-    nestedDraggable
-  },
-  created() {
-    this.getTodo();
-  },
-  methods: {
-    dateBeautify(data) {
-      data.forEach((currentValue, index, arr) => {
-        let m = new Date(parseInt(currentValue.created_at));
-        currentValue.created_att =
-          m.getFullYear() +
-          "-" +
-          m.getMonth() +
-          "-" +
-          m.getDate() +
-          " " +
-          m.getHours() +
-          ":" +
-          m.getMinutes() +
-          ":" +
-          m.getSeconds();
-        currentValue.tasks.forEach(val => {
-          let d = new Date(parseInt(val.created_at));
-          val.created_att =
-            d.getFullYear() +
-            "-" +
-            d.getMonth() +
-            "-" +
-            d.getDate() +
-            "  " +
-            d.getHours() +
-            ":" +
-            d.getMinutes() +
-            ":" +
-            d.getSeconds();
-          if (val.tasks.length > 0) {
-            dateBeautify(val.tasks);
-          }
+    watch: {
+      isDragging(newValue) {
+        if (newValue) {
+          this.delayedDragging = true;
+          return;
+        }
+        this.$nextTick(() => {
+          this.delayedDragging = false;
         });
-      });
+      },
+      parentTodo(val) {
+        this.parentTodo = val;
+      },
+      selectedTodo(val) {
+        this.selectedTodo = val;
+      },
+      SaveChangesEnabled(val) {
+        this.SaveChangesEnabled = val;
+      }
     },
-    async getTodo(id = null) {
-      await axios
+    components: {
+      nestedDraggable
+    },
+    created() {
+      this.getTodo();
+    },
+    methods: {
+      dateBeautify(data) {
+        data.forEach((currentValue) => {
+          let m = new Date(parseInt(currentValue.created_at));
+          currentValue.created_att = m.getFullYear() +"-" + m.getMonth() + "-" + m.getDate() +" " + m.getHours() + ":" +m.getMinutes() + ":" + m.getSeconds();
+          currentValue.tasks.forEach(val => {
+            let d = new Date(parseInt(val.created_at));
+            val.created_att =
+            d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate() + " " +d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
+            if (val.tasks.length > 0) {
+              this.dateBeautify(val.tasks);
+            }
+          });
+        });
+      },
+      async getTodo(id = null) {
+        await axios
         .get("http://localhost:8081/api/my-todos", {
           params: {
             token: localStorage.getItem("token")
@@ -173,149 +152,150 @@ export default {
           if (res.data.length == 0) {
             this.parentTodo = -1;
           } else {
-            this.todos = res.data;
-            this.parentTodo = res.data.filter(data => data.parent == 0);
             const plugin = document.createElement("script");
             plugin.setAttribute("src", "/js/sly.min.js");
             plugin.async = true;
             document.head.appendChild(plugin);
+            this.todos = res.data;
+            this.parentTodo = res.data.filter(data => data.parent == 0);
             this.dateBeautify(this.todos);
             if (id == null) {
-              this.showTodo(this.todos[0]._id);
+             this.showTodo(this.todos[0]._id);
             } else {
-              this.showTodo(id);
+             this.showTodo(id);
             }
+
           }
         })
         .catch(err => {
           if (err.request.response == "expired") {
             this.$root.$emit("expired");
-          } else if (err.request.status === 0) {
+          } else if (err.request.status == 0) {
             this.getTodo();
             swal({
               icon: "error",
               title: "Sorry !",
               text:
-                "Connection to server failed! Reload the page or try again later"
+              "Connection to server failed! Reload the page or try again later"
             });
           }
         });
-    },
-    addTask() {
-      this.$router.push({
-        name: "new-todo",
-        query: { todo: this.selectedTodo[0]._id }
-      });
-    },
-    showTodo(todoId) {
-      this.selectedTodo = [];
-      this.list = this.todos.map((body, index) => {
-        return { body, order: index + 1, fixed: false };
-      });
-      let todo = [];
-      todo[0] = this.todos.filter(data => data._id == todoId)[0];
-      todo[1] = todo[0].tasks;
-      this.selectedTodo = todo;
-    },
-    deleteTodo(todoId) {
-      swal("Delete the Todo?", {
-        buttons: {
-          cancel: "No!",
-          Logout: {
-            text: "Yes! Delete",
-            value: "delete"
+      },
+      addTask() {
+        this.$router.push({
+          name: "new-todo",
+          query: { todo: this.selectedTodo[0]._id }
+        });
+      },
+      showTodo(todoId) {
+        this.selectedTodo = [];
+        this.list = this.todos.map((body, index) => {
+          return { body, order: index + 1, fixed: false };
+        });
+        let todo = [];
+        todo[0] = this.todos.filter(data => data._id == todoId)[0];
+        todo[1] = todo[0].tasks;
+        this.selectedTodo = todo;
+      },
+      deleteTodo(todoId) {
+        swal("Delete the Todo?", {
+          buttons: {
+            cancel: "No!",
+            Logout: {
+              text: "Yes! Delete",
+              value: "delete"
+            }
           }
-        }
-      }).then(value => {
-        switch (value) {
-          case "delete":
+        }).then(value => {
+          switch (value) {
+            case "delete":
             axios
-              .post("http://localhost:8081/api/todo/delete", {
-                token: localStorage.getItem("token"),
-                todoId
-              })
-              .then(res => {
-                this.getTodo();
-              })
-              .catch(err => {});
+            .post("http://localhost:8081/api/todo/delete", {
+              token: localStorage.getItem("token"),
+              todoId
+            })
+            .then(res => {
+              this.getTodo();
+            })
+            .catch(err => {});
             break;
-          default:
+            default:
             swal({ text: "Delete cancelled!", button: false, timer: 1000 });
-        }
-      });
-    },
-    SaveChanges(todoId) {
-      swal("Save the changes?", {
-        buttons: {
-          cancel: "No!",
-          Logout: {
-            text: "Save",
-            value: "save"
           }
-        }
-      }).then(value => {
-        if (value == "save") {
-          this.dataParse(this.selectedTodo[1]);
-          // axios
-          //   .post("http://localhost:8081/api/todo-save-order", {
-          //     token: localStorage.getItem("token"),
-          //     todoId,
-          //     newOrder: this.selectedTodo[1]
-          //   })
-          //   .then(res => {
-          //     if (res.data.nModified == 1) {
-          //       this.getTodo(todoId);
-          //     }
-          //   })
-          //   .catch(err => {
-          //     console.log(err);
-          //   });
+        });
+      },
+      SaveChanges(todoId) {
+        swal("Save the changes?", {
+          buttons: {
+            cancel: "No!",
+            Logout: {
+              text: "Save",
+              value: "save"
+            }
+          }
+        }).then(value => {
+          if (value == "save") {
+            this.dataParse(this.selectedTodo[1]);
+          axios
+            .post("http://localhost:8081/api/todo-save-order", {
+              token: localStorage.getItem("token"),
+              todoId,
+              newOrder: this.selectedTodo[1]
+            })
+            .then(res => {
+              if (res.data.nModified == 1) {
+                this.getTodo(todoId);
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            });
         } else {
         }
       });
-    },
-    dataParse(data) {
-      data.forEach((currentValue, index, arr) => {
-        delete currentValue.created_att;
-        console.log(currentValue);
-        currentValue.tasks.forEach(val => {
-          if (val.tasks.length > 0) {
-            dateParse(val.tasks);
+      },
+      dataParse(data) {
+        data.forEach((currentValue) => {
+          delete currentValue.created_att;
+          currentValue.tasks.forEach((val) => {
+           delete val.created_att;
+           if (val.tasks.length > 0) {
+            this.dateParse(val.tasks);
           }
         });
+        });
+      },
+      orderList() {
+        this.list = this.list.sort((one, two) => {
+          return one.order - two.order;
+        });
+      },
+      onMove({ relatedContext, draggedContext }) {
+        const relatedElement = relatedContext.element;
+        const draggedElement = draggedContext.element;
+        return (
+          (!relatedElement || !relatedElement.fixed) && !draggedElement.fixed
+          );
+      }
+    },
+    mounted() {
+      this.$on("changed", data => {
+        this.SaveChangesEnabled = true;
+        this.selectedTodo[1] = data.tasks;
+        this.selectedTodo[0].tasks = data.tasks;
       });
     },
-    orderList() {
-      this.list = this.list.sort((one, two) => {
-        return one.order - two.order;
-      });
-    },
-    onMove({ relatedContext, draggedContext }) {
-      const relatedElement = relatedContext.element;
-      const draggedElement = draggedContext.element;
-      return (
-        (!relatedElement || !relatedElement.fixed) && !draggedElement.fixed
-      );
+    computed: {
+      dragOptions() {
+        return {
+          animation: 200,
+          group: "description",
+          disabled: !this.editable,
+          ghostClass: "ghost"
+        };
+      }
     }
-  },
-  mounted() {
-    this.$on("changed", data => {
-      this.SaveChangesEnabled = true;
-      this.selectedTodo[1] = data.tasks;
-      this.selectedTodo[0].tasks = data.tasks;
-    });
-  },
-  computed: {
-    dragOptions() {
-      return {
-        animation: 200,
-        group: "description",
-        disabled: !this.editable,
-        ghostClass: "ghost"
-      };
-    }
-  }
-};
+  };
 </script>
 
 <style scoped>

@@ -60,9 +60,9 @@ module.exports.createTaskById = (newTask, callback) => {
 
 module.exports.changeTaskStatus = (todoId, userId, taskId, callback) => {
     Todo.updateOne({
-        "_id": mongoose.Types.ObjectId(todoId),
-        "user": userId,
-        "tasks._id": mongoose.Types.ObjectId(taskId)
+        "_id": todoId,
+        "user":  userId,
+        "tasks._id": taskId
     }, { $set: { "tasks.$.active": false } }, callback);
 };
 
@@ -71,5 +71,5 @@ module.exports.changeTodoStatus = (data, callback) => {
 };
 
 module.exports.TodoSaveOrder = (data, callback) => {
-    Todo.updateOne({ user: data.user, _id: mongoose.Types.ObjectId(data.todo) }, { $set: { "tasks": data.newOrder } }, callback);
+    Todo.updateOne({ "user": data.user, "_id": mongoose.Types.ObjectId(data.todo) }, { $set: { "tasks": data.newOrder } }, callback);
 };
